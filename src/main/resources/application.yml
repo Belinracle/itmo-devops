@@ -1,0 +1,10 @@
+server:
+  port: 80
+
+spring:
+  application:
+    name: rjp-backend
+  r2dbc:
+    username: ${R2DBC_USERNAME}
+    password: ${R2DBC_PASSWORD}
+    url: ${R2DBC_URL}

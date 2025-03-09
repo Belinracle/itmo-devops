@@ -1,40 +1,44 @@
 package ru.itmo.rjpbackend.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.util.Pair;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import ru.itmo.rjpbackend.dto.FilterDTO;
-import ru.itmo.rjpbackend.dto.ProductDTO;
-import ru.itmo.rjpbackend.service.ProductService;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.itmo.rjpbackend.entity.ProductEntity;
+import ru.itmo.rjpbackend.repository.ProductRepository;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/products")
 @RequiredArgsConstructor
 public class ProductController {
-    private final ProductService productService;
+    private final ProductRepository productRepository;
 
-    @GetMapping(produces = MediaType.APPLICATION_NDJSON_VALUE)
-    Flux<ProductDTO> getAllProducts(@ModelAttribute @Valid FilterDTO filter) {
-        Mono<Pair<Double, Integer>> pairMono = productService.countAllMatching(filter);
-        return pairMono.flatMapMany(pair -> productService.findAllMatching(filter)
-                .map(productEntity -> new ProductDTO(
-                        productEntity.getId(),
-                        productEntity.getPrice(),
-                        productEntity.getAvgRating(),
-                        productEntity.getReviewCount(),
-                        productEntity.getName(),
-                        null,
-                        null,
-                        null,
-                        null,
-                        pair.getFirst(),
-                        pair.getSecond()
-                ))
-        );
+//    @GetMapping(produces = MediaType.APPLICATION_NDJSON_VALUE)
+//    ProductDTO getAllProducts(@ModelAttribute @Valid FilterDTO filter) {
+//        Mono<Pair<Double, Integer>> pairMono = productService.countAllMatching(filter);
+//        return pairMono.flatMapMany(pair -> productService.findAllMatching(filter)
+//                .map(productEntity -> new ProductDTO(
+//                        productEntity.getId(),
+//                        productEntity.getPrice(),
+//                        productEntity.getAvgRating(),
+//                        productEntity.getReviewCount(),
+//                        productEntity.getName(),
+//                        null,
+//                        null,
+//                        null,
+//                        null,
+//                        pair.getFirst(),
+//                        pair.getSecond()
+//                ))
+//        );
+//    }
+
+    @GetMapping
+    List<ProductEntity> getAllProducts() {
+        return productRepository.findAll();
     }
 }

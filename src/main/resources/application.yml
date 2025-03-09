@@ -4,7 +4,11 @@ server:
 spring:
   application:
     name: rjp-backend
-  r2dbc:
-    username: ${R2DBC_USERNAME}
-    password: ${R2DBC_PASSWORD}
-    url: ${R2DBC_URL}
+  datasource:
+    url: jdbc:mysql://localhost:3306/product_management
+    username: root
+    password: Mysql@123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true

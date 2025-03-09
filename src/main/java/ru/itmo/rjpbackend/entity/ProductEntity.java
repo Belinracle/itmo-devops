@@ -1,20 +1,21 @@
 package ru.itmo.rjpbackend.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDate;
 
 @Data
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("Product")
+@Table(name = "product")
 public class ProductEntity {
     @Id
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private Double price;
 
@@ -29,4 +30,5 @@ public class ProductEntity {
     private Integer countryId;
 
     private Integer manufacturerId;
+
 }

@@ -1,7 +1,6 @@
 package ru.itmo.rjpbackend.dto;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public record ProductDTO(
         Integer id,
@@ -10,9 +9,6 @@ public record ProductDTO(
         Integer reviewCount,
         String name,
         LocalDate releaseDate,
-        CountryDTO country,
-        ManufacturerDTO manufacturer,
-        List<ReviewDTO> reviews,
         Double totalAvgRating,
         Integer productCount
 ) {

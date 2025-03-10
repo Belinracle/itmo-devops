@@ -6,4 +6,5 @@ import ru.itmo.rjpbackend.entity.ProductEntity;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
+    ProductEntity findByName(String name);
 }

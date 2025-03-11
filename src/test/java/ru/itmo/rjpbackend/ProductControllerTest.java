@@ -3,12 +3,7 @@ package ru.itmo.rjpbackend;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import lombok.val;
-import org.junit.FixMethodOrder;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -26,6 +21,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProductControllerTest {
 
@@ -60,10 +57,10 @@ class ProductControllerTest {
     @BeforeEach
     void setUp() {
         RestAssured.baseURI = "http://localhost:" + port;
-        productRepository.deleteAll();
     }
 
     @Test
+    @Order(1)
     void shouldGetAllProducts() {
         List<ProductEntity> products = List.of(
                 new ProductEntity(null, 1D, 1D, 1, "1", LocalDate.now(), 1, 1),
@@ -83,15 +80,8 @@ class ProductControllerTest {
     }
 
     @Test
+    @Order(2)
     void shouldGetById() {
-        List<ProductEntity> products = List.of(
-                new ProductEntity(null, 1D, 1D, 1, "1", LocalDate.now(), 1, 1),
-                new ProductEntity(null, 2D, 2D, 2, "2", LocalDate.now(), 2, 2),
-                new ProductEntity(null, 3D, 3D, 3, "3", LocalDate.now(), 3, 3),
-                new ProductEntity(null, 4D, 4D, 4, "4", LocalDate.now(), 4, 4)
-        );
-        productRepository.saveAll(products);
-
         given()
                 .contentType(ContentType.JSON)
                 .when()
@@ -102,15 +92,19 @@ class ProductControllerTest {
     }
 
     @Test
-    void shouldDelete() {
-        List<ProductEntity> products = List.of(
-                new ProductEntity(null, 1D, 1D, 1, "1", LocalDate.now(), 1, 1),
-                new ProductEntity(null, 2D, 2D, 2, "2", LocalDate.now(), 2, 2),
-                new ProductEntity(null, 3D, 3D, 3, "3", LocalDate.now(), 3, 3),
-                new ProductEntity(null, 4D, 4D, 4, "4", LocalDate.now(), 4, 4)
-        );
-        productRepository.saveAll(products);
+    @Order(3)
+    void shouldGetByIdFail() {
+        given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/products/5")
+                .then()
+                .statusCode(404);
+    }
 
+    @Test
+    @Order(4)
+    void shouldDelete() {
         given()
                 .contentType(ContentType.JSON)
                 .when()
@@ -122,18 +116,9 @@ class ProductControllerTest {
     }
 
     @Test
-    void shouldGetByIdFail() {
-        given()
-                .contentType(ContentType.JSON)
-                .when()
-                .get("/products/1")
-                .then()
-                .statusCode(404);
-    }
-
-    @Test
+    @Order(5)
     void shouldInsert() {
-        val productRequest = new ProductEntity(null, 1D, 1D, 1, "1", LocalDate.now(), 1, 1);
+        val productRequest = new ProductEntity(null, 5D, 5D, 5, "5", LocalDate.now(), 5, 5);
         given()
                 .contentType(ContentType.JSON)
                 .body(productRequest)
@@ -142,16 +127,14 @@ class ProductControllerTest {
                 .then()
                 .statusCode(201);
 
-        ProductEntity product = productRepository.findByName("1");
-        assertEquals(1, product.getPrice());
+        ProductEntity product = productRepository.findByName("5");
+        assertEquals(5, product.getPrice());
     }
 
     @Test
+    @Order(6)
     void shouldUpdate() {
-        val productRequest = new ProductEntity(null, 1D, 1D, 1, "1", LocalDate.now(), 1, 1);
-        productRepository.save(productRequest);
-        productRequest.setId(1L);
-        productRequest.setPrice(2D);
+        val productRequest = new ProductEntity(1L, 55D, 1D, 1, "1", LocalDate.now(), 1, 1);
         given()
                 .contentType(ContentType.JSON)
                 .body(productRequest)
@@ -161,8 +144,8 @@ class ProductControllerTest {
                 .statusCode(201);
 
         long productCount = productRepository.count();
-        assertEquals(1, productCount);
+        assertEquals(4, productCount);
         val product = productRepository.findByName("1");
-        assertEquals(2D, product.getPrice());
+        assertEquals(55D, product.getPrice());
     }
 }

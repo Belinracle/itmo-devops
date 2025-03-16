@@ -16,6 +16,8 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       - name: Build with Maven
+        working-directory: ./backend
         run: mvn clean install -DskipTests
       - name: Test with maven
+        working-directory: ./backend
         run: mvn test

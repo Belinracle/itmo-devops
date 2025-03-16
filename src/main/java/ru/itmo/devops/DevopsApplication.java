@@ -1,13 +1,13 @@
-package ru.itmo.rjpbackend;
+package ru.itmo.devops;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RjpBackendApplication {
+public class DevopsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(RjpBackendApplication.class, args);
+        SpringApplication.run(DevopsApplication.class, args);
     }
 
 }

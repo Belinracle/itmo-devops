@@ -1,11 +1,11 @@
-package ru.itmo.rjpbackend.controller;
+package ru.itmo.devops.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import ru.itmo.rjpbackend.exceptions.ResourceNotFoundException;
+import ru.itmo.devops.exceptions.ResourceNotFoundException;
 
 @ControllerAdvice
 @Slf4j

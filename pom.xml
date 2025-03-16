@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>ru.itmo</groupId>
-    <artifactId>rjp-backend</artifactId>
+    <artifactId>devops</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>rjp-backend</name>
-    <description>rjp-backend</description>
+    <name>devops</name>
+    <description>devops</description>
     <url/>
     <licenses>
         <license/>

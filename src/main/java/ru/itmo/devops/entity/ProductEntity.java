@@ -1,4 +1,4 @@
-package ru.itmo.rjpbackend.entity;
+package ru.itmo.devops.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

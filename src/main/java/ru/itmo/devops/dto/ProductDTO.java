@@ -1,4 +1,4 @@
-package ru.itmo.rjpbackend.dto;
+package ru.itmo.devops.dto;
 
 import java.time.LocalDate;
 

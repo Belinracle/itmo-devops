@@ -1,13 +1,13 @@
-package ru.itmo.rjpbackend.controller;
+package ru.itmo.devops.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.itmo.rjpbackend.entity.ProductEntity;
-import ru.itmo.rjpbackend.exceptions.ResourceNotFoundException;
-import ru.itmo.rjpbackend.repository.ProductRepository;
+import ru.itmo.devops.entity.ProductEntity;
+import ru.itmo.devops.exceptions.ResourceNotFoundException;
+import ru.itmo.devops.repository.ProductRepository;
 
 import java.util.List;
 

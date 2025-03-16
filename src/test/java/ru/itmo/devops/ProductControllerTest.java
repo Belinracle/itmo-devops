@@ -1,4 +1,4 @@
-package ru.itmo.rjpbackend;
+package ru.itmo.devops;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -10,8 +10,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import ru.itmo.rjpbackend.entity.ProductEntity;
-import ru.itmo.rjpbackend.repository.ProductRepository;
+import ru.itmo.devops.entity.ProductEntity;
+import ru.itmo.devops.repository.ProductRepository;
 
 import java.time.LocalDate;
 import java.util.List;

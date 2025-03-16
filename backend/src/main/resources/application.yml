@@ -1,13 +1,14 @@
 server:
-  port: 80
+  port: 8080
 
 spring:
   application:
-    name: rjp-backend
+    name: product-backend
   datasource:
-    url: jdbc:mysql://localhost:3306/product_management
-    username: root
-    password: Mysql@123
+    url: jdbc:postgresql://database:5432/postgres_db
+    username: postgres_user
+    password: postgres_password
+    driverClassName: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update

@@ -2,10 +2,12 @@ services:
   backend:
     build:
       context: backend
-
-  frontend:
-    build:
-
+    depends_on:
+      - database
+    ports:
+      - "8080:8080"
+#  frontend:
+#    build:
   database:
     image: postgres:14.17-alpine
     environment:

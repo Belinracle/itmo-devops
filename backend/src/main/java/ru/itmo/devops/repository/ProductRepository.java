@@ -7,4 +7,5 @@ import ru.itmo.devops.entity.ProductEntity;
 
 @Repository
 public interface ProductRepository extends CrudRepository<ProductEntity, Long>, JpaSpecificationExecutor<ProductEntity> {
+    ProductEntity findByName(String name);
 }

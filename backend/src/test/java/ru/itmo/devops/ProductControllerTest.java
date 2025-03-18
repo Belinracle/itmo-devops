@@ -1,24 +1,30 @@
 package ru.itmo.devops;
 
 import io.restassured.RestAssured;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import lombok.val;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
+import ru.itmo.devops.dto.ProductDTO;
 import ru.itmo.devops.entity.ProductEntity;
 import ru.itmo.devops.repository.ProductRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -69,14 +75,13 @@ class ProductControllerTest {
                 new ProductEntity(null, 4D, 4D, 4, "4", LocalDate.now(), 4, 4)
         );
         productRepository.saveAll(products);
-
-        given()
+        Map<String, Object> productsResponse = given()
                 .contentType(ContentType.JSON)
                 .when()
-                .get("/products")
-                .then()
-                .statusCode(200)
-                .body(".", hasSize(4));
+                .get("api/products").as(new TypeRef<>() {
+                });
+        val productList = (List<String>)productsResponse.get("content");
+        assertEquals(4,productList.size());
     }
 
     @Test
@@ -85,7 +90,7 @@ class ProductControllerTest {
         given()
                 .contentType(ContentType.JSON)
                 .when()
-                .get("/products/2")
+                .get("api/products/2")
                 .then()
                 .statusCode(200)
                 .body("reviewCount", equalTo(2));
@@ -97,7 +102,7 @@ class ProductControllerTest {
         given()
                 .contentType(ContentType.JSON)
                 .when()
-                .get("/products/5")
+                .get("api/products/5")
                 .then()
                 .statusCode(404);
     }
@@ -108,7 +113,7 @@ class ProductControllerTest {
         given()
                 .contentType(ContentType.JSON)
                 .when()
-                .delete("/products/2")
+                .delete("api/products/2")
                 .then()
                 .statusCode(200);
 
@@ -123,7 +128,7 @@ class ProductControllerTest {
                 .contentType(ContentType.JSON)
                 .body(productRequest)
                 .when()
-                .post("/products")
+                .post("api/products")
                 .then()
                 .statusCode(201);
 
@@ -139,7 +144,7 @@ class ProductControllerTest {
                 .contentType(ContentType.JSON)
                 .body(productRequest)
                 .when()
-                .post("/products")
+                .post("api/products")
                 .then()
                 .statusCode(201);
 

@@ -1,81 +1,71 @@
-//package ru.itmo.rjpbackend.service;
-//
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.data.domain.Sort;
-//import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-//import org.springframework.data.relational.core.query.Criteria;
-//import org.springframework.data.util.Pair;
-//import org.springframework.stereotype.Service;
-//import reactor.core.publisher.Flux;
-//import reactor.core.publisher.Mono;
-//import ru.itmo.rjpbackend.entity.ProductEntity;
-//import ru.itmo.rjpbackend.repository.ProductRepository;
-//
-//import static org.springframework.data.relational.core.query.Query.query;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class ProductService {
-//    private final R2dbcEntityTemplate template;
-//    private final ProductRepository productRepository;
-//
-//    public Mono<ProductEntity> save(ProductEntity productEntity) {
-//        return productRepository.save(productEntity);
-//    }
-//
-//    public Flux<ProductEntity> findNRandom(Integer n) {
-//        return productRepository.findRandomLimit(n);
-//    }
-//
-//    public Mono<Pair<Double, Integer>> countAllMatching(FilterDTO filter) {
-//        return template.select(ProductEntity.class)
-//                .matching(query(buildCriteria(filter)))
-//                .all()
-//                .reduce(new Double[]{0.0, 0.0}, (acc, productEntity) -> {
-//                    acc[0] += productEntity.getAvgRating();
-//                    acc[1]++;
-//                    return acc;
-//                })
-//                .map(acc -> Pair.of(acc[1] > 0 ? acc[0] / acc[1] : 0.0, acc[1].intValue()));
-//    }
-//
-//    public Flux<ProductEntity> findAllMatching(FilterDTO filter) {
-//        int pageSize = filter.pageSize() != null ? filter.pageSize() : 10;
-//        int pageNumber = filter.pageNumber() != null ? filter.pageNumber() : 0;
-//        return template.select(ProductEntity.class)
-//                .matching(query(buildCriteria(filter))
-//                        .sort(Sort.by("id"))
-//                        .limit(pageSize)
-//                        .offset((long) pageSize * pageNumber))
-//                .all();
-//    }
-//
-//    private Criteria buildCriteria(FilterDTO filter) {
-//        Criteria criteria = Criteria.empty();
-//        if (filter.fromPrice() != null) {
-//            criteria = criteria.and("price").greaterThanOrEquals(filter.fromPrice());
-//        }
-//        if (filter.toPrice() != null) {
-//            criteria = criteria.and("price").lessThanOrEquals(filter.toPrice());
-//        }
-//        if (filter.fromRating() != null) {
-//            criteria = criteria.and("avg_rating").greaterThanOrEquals(filter.fromRating());
-//        }
-//        if (filter.toRating() != null) {
-//            criteria = criteria.and("avg_rating").lessThanOrEquals(filter.toRating());
-//        }
-//        if (filter.manufacturers() != null && !filter.manufacturers().isEmpty()) {
-//            criteria = criteria.and("manufacturer_id").in(filter.manufacturers());
-//        }
-//        if (filter.countries() != null && !filter.countries().isEmpty()) {
-//            criteria = criteria.and("country_id").in(filter.countries());
-//        }
-//        if (filter.fromDate() != null) {
-//            criteria = criteria.and("release_date").greaterThanOrEquals(filter.fromDate());
-//        }
-//        if (filter.toDate() != null) {
-//            criteria = criteria.and("release_date").lessThanOrEquals(filter.toDate());
-//        }
-//        return criteria;
-//    }
-//}
+package ru.itmo.devops.service;
+
+import jakarta.persistence.criteria.Predicate;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import ru.itmo.devops.dto.FilterDTO;
+import ru.itmo.devops.entity.ProductEntity;
+import ru.itmo.devops.repository.ProductRepository;
+
+import java.util.NoSuchElementException;
+
+@Service
+@RequiredArgsConstructor
+public class ProductService {
+    private final ProductRepository productRepository;
+
+    public ProductEntity save(ProductEntity productEntity) {
+        return productRepository.save(productEntity);
+    }
+
+    public void deleteById(Long id) {
+        productRepository.deleteById(id);
+    }
+
+    public ProductEntity findById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Product with id " + id + " not found"));
+    }
+
+    public Page<ProductEntity> findAllMatching(FilterDTO filter) {
+        int pageSize = filter.pageSize() != null ? filter.pageSize() : 10;
+        int pageNumber = filter.pageNumber() != null ? filter.pageNumber() : 0;
+        var pageable = PageRequest.of(pageNumber, pageSize);
+        var specification = buildSpecification(filter);
+        return productRepository.findAll(specification, pageable);
+    }
+
+    private Specification<ProductEntity> buildSpecification(FilterDTO filter) {
+        return (root, query, builder) -> {
+            Predicate predicate = builder.conjunction();
+            if (filter.fromPrice() != null) {
+                predicate = builder.and(predicate, builder.greaterThanOrEqualTo(root.get("price"), filter.fromPrice()));
+            }
+            if (filter.toPrice() != null) {
+                predicate = builder.and(predicate, builder.lessThanOrEqualTo(root.get("price"), filter.toPrice()));
+            }
+            if (filter.fromRating() != null) {
+                predicate = builder.and(predicate, builder.greaterThanOrEqualTo(root.get("avgRating"), filter.fromRating()));
+            }
+            if (filter.toRating() != null) {
+                predicate = builder.and(predicate, builder.lessThanOrEqualTo(root.get("avgRating"), filter.toRating()));
+            }
+            if (filter.manufacturerId() != null) {
+                predicate = builder.and(predicate, builder.equal(root.get("manufacturerId"), filter.manufacturerId()));
+            }
+            if (filter.countryId() != null) {
+                predicate = builder.and(predicate, builder.equal(root.get("countryId"), filter.countryId()));
+            }
+            if (filter.fromDate() != null) {
+                predicate = builder.and(predicate, builder.greaterThanOrEqualTo(root.get("releaseDate"), filter.fromDate()));
+            }
+            if (filter.toDate() != null) {
+                predicate = builder.and(predicate, builder.lessThanOrEqualTo(root.get("releaseDate"), filter.toDate()));
+            }
+            return predicate;
+        };
+    }
+}

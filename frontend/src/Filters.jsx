@@ -122,6 +122,15 @@ const Filters = memo(({
                             setFormState={setFormState}
                             emptyValueMap={emptyValueMap}
                         />
+                    ) : type === "number" ? (
+                        <Input
+                            label="Число"
+                            type="number"
+                            id={filters[0]}
+                            placeholder={placeholders[0]}
+                            value={formState[filters[0]]}
+                            onChange={handleInputChange(filters[0])}
+                        />
                     ) : null}
                 </CollapsibleBox>
             ))}

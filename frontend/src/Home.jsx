@@ -28,17 +28,19 @@ const controls = [
     { type: "numberRange", label: "Рейтинг", filters: ["fromRating", "toRating"], placeholders: ["1", "5"] },
     //{ type: "autoComplete", label: "Производитель", filters: ["manufacturers"] },
     //{ type: "autoComplete", label: "Страна производства", filters: ["countries"] },
+    { type: "number", label: "Производитель", filters: ["manufacturerId"], placeholders: ["Неотрицательное число"] },
+    { type: "number", label: "Страна производства", filters: ["countryId"], placeholders: ["Неотрицательное число"] },
     { type: "dateRange", label: "Дата выпуска", filters: ["fromDate", "toDate"] },
 ];
 
-const emptyValueMap = { numberRange: "", dateRange: null, autoComplete: [] };
+const emptyValueMap = { number: "", numberRange: "", dateRange: null, autoComplete: [] };
 const emptyState = Object.fromEntries(
     controls.flatMap(({ type, filters }) => filters.map((filter) => [filter, emptyValueMap[type]]))
 );
 
 const pageSizes = [10, 20, 30, 40, 50];
 
-const apiUrl = "http://localhost:8080/products";
+const apiUrl = "http://localhost:8080/api/products";
 
 const Home = () => {
     const smIsUp = useMediaQuery((theme) => theme.breakpoints.up("sm"));
@@ -54,6 +56,7 @@ const Home = () => {
 
     const [pageSize, setPageSize] = useState(10);
     const [pageNumber, setPageNumber] = useState(0);
+    const [pageCount, setPageCount] = useState(0);
 
     const filterDTO = useMemo(() => Object.fromEntries(
         controls.flatMap(({ type, filters }) => (
@@ -83,8 +86,10 @@ const Home = () => {
 
         fetch(`${apiUrl}?${requestParams}`)
             .then((response) => response.json())
-            .then((data) => {
-                setProducts(data)
+            .then(({ content, totalElements, totalPages }) => {
+                setProducts(content);
+                setProductCount(totalElements);
+                setPageCount(totalPages);
             })
             .finally(() => setIsLoading(false));
     }, [filterDTO, pageNumber, pageSize])
@@ -109,7 +114,10 @@ const Home = () => {
 
     const handleApplyClick = useCallback(() => fetchProducts(), [fetchProducts]);
 
-    const handlePageSizeChange = (e) => setPageSize(e.target.value);
+    const handlePageSizeChange = (e) => {
+        setPageSize(e.target.value);
+        setPageNumber(0);
+    }
 
     const handlePageNumberChange = (e, v) => setPageNumber(v - 1);
 
@@ -233,7 +241,7 @@ const Home = () => {
                             }}
                         >
                             <Pagination
-                                count={Math.ceil(productCount / pageSize)}
+                                count={pageCount}
                                 page={pageNumber + 1}
                                 onChange={handlePageNumberChange}
                                 sx={{

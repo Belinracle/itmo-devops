@@ -19,7 +19,7 @@ const fields = [
 const emptyValueMap = { text: "", number: "", date: null };
 const emptyState = Object.fromEntries(fields.map(({ type, name }) => [name, emptyValueMap[type]]));
 
-const apiUrl = "http://localhost:8080/products";
+const apiUrl = "http://localhost:8080/api/products";
 
 const Admin = () => {
     const [formState, setFormState] = useState(emptyState);

@@ -9,10 +9,11 @@ import "dayjs/locale/ru";
 
 import { theme } from "./theme.js";
 import Home from "./Home.jsx";
+import Admin from "./Admin.jsx";
 
-// TODO: админская панель
 const router = createBrowserRouter([
     { path: "/", element: <Home/> },
+    { path: "/admin", element: <Admin/> },
 ]);
 
 const App = () => {

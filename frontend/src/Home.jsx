@@ -17,11 +17,7 @@ import {
     Typography,
     useMediaQuery
 } from "@mui/material";
-import { yellow } from "@mui/material/colors";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
-import StarRoundedIcon from "@mui/icons-material/StarRounded";
-
-import useWebSocket from "react-use-websocket";
 
 import Navbar from "./Navbar.jsx";
 import Filters from "./Filters.jsx";
@@ -30,8 +26,8 @@ import ProductPreview from "./ProductPreview.jsx";
 const controls = [
     { type: "numberRange", label: "Цена, ₽", filters: ["fromPrice", "toPrice"], placeholders: ["1", "100000"] },
     { type: "numberRange", label: "Рейтинг", filters: ["fromRating", "toRating"], placeholders: ["1", "5"] },
-    { type: "autoComplete", label: "Производитель", filters: ["manufacturers"] },
-    { type: "autoComplete", label: "Страна производства", filters: ["countries"] },
+    //{ type: "autoComplete", label: "Производитель", filters: ["manufacturers"] },
+    //{ type: "autoComplete", label: "Страна производства", filters: ["countries"] },
     { type: "dateRange", label: "Дата выпуска", filters: ["fromDate", "toDate"] },
 ];
 
@@ -42,7 +38,7 @@ const emptyState = Object.fromEntries(
 
 const pageSizes = [10, 20, 30, 40, 50];
 
-const fetchUrl = "http://localhost:80/products";
+const apiUrl = "http://localhost:8080/products";
 
 const Home = () => {
     const smIsUp = useMediaQuery((theme) => theme.breakpoints.up("sm"));
@@ -54,7 +50,7 @@ const Home = () => {
 
     const [formState, setFormState] = useState(emptyState);
     const [products, setProducts] = useState([]);
-    const [stats, setStats] = useState(null);
+    const [productCount, setProductCount] = useState(0);
 
     const [pageSize, setPageSize] = useState(10);
     const [pageNumber, setPageNumber] = useState(0);
@@ -76,47 +72,21 @@ const Home = () => {
 
     const fetchProducts = useCallback(() => {
         setIsLoading(true);
-        setProducts([]);
-        setStats({ productCount: 0, totalAvgRating: 0 });
+        setProducts([]); // TODO: нужно ли?
+        setProductCount(0);
+        //setStats({ productCount: 0, totalAvgRating: 0 });
 
         const requestParams = new URLSearchParams({ pageNumber, pageSize });
         Object.entries(filterDTO).forEach(([key, value]) => (
             Array.isArray(value) ? value.forEach((el) => requestParams.append(key, el)) : requestParams.append(key, value)
         ));
 
-        // TODO: упростить?
-        fetch(`${fetchUrl}?${requestParams}`)
-            .then((response) => {
-                if (response.ok) {
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder("utf-8");
-                    let readStream, buffer = "";
-                    reader.read().then(readStream = ({ done, value }) => {
-                        if (done) {
-                            setIsLoading(false);
-                            return;
-                        }
-
-                        buffer += decoder.decode(value, { stream: true });
-                        const lines = buffer.split("\n");
-                        lines.forEach((line) => {
-                            if (line.trim()) {
-                                try {
-                                    const productDTO = JSON.parse(line);
-                                    const { totalAvgRating, productCount, ...product } = productDTO;
-                                    setStats({ productCount, totalAvgRating });
-                                    setProducts((prevState) => [...prevState, product]);
-                                } catch (e) {
-                                    console.error("Couldn't parse this product: ", line, e);
-                                }
-                            }
-                        });
-
-                        buffer = lines.pop(); // чтобы не потерять неполный объект
-                        reader.read().then(readStream);
-                    });
-                }
-            });
+        fetch(`${apiUrl}?${requestParams}`)
+            .then((response) => response.json())
+            .then((data) => {
+                setProducts(data)
+            })
+            .finally(() => setIsLoading(false));
     }, [filterDTO, pageNumber, pageSize])
 
     useEffect(() => {
@@ -216,7 +186,7 @@ const Home = () => {
                     </Drawer>
                 )}
                 <Stack spacing={{ xs: 2, sm: 3 }} width={1}>
-                    {stats && (isLoading ? (
+                    {isLoading ? (
                         <Skeleton animation="wave" variant="rounded" height={42} sx={{ borderRadius: 3 }}/>
                     ) : (
                         <Box sx={{
@@ -226,21 +196,17 @@ const Home = () => {
                             bgcolor: 'background.paper',
                             borderRadius: 3,
                         }}>
-                            {stats.productCount ? (
-                                <Typography variant="button">
-                                    Найдено <b>&nbsp;{stats.productCount}&nbsp;</b> товаров с общим средним
-                                    рейтингом <b>&nbsp;{stats.totalAvgRating.toFixed(1)}&nbsp;</b>
-                                    <StarRoundedIcon
-                                        sx={{ color: yellow[700], fontSize: 'large', verticalAlign: 'text-bottom' }}
-                                    />
-                                </Typography>
-                            ) : (
-                                <Typography variant="button">Товары не найдены 😔</Typography>
-                            )}
+                            <Typography variant="button">
+                                {productCount ? (
+                                    <>Найдено <b>&nbsp;{productCount}&nbsp;</b> товаров</>
+                                ) : (
+                                    <>Товары не найдены 😔</>
+                                )}
+                            </Typography>
                         </Box>
-                    ))}
+                    )}
                     <Grid2 container spacing={{ xs: 2, sm: 3 }} width={1}>
-                        {products && products.map(({ id, name, avgRating, reviewCount, price }) => (
+                        {products?.map(({ id, name, avgRating, reviewCount, price }) => (
                             <Grid2 key={id} size={{ xs: 6, sm: 4, md: 3, xl: 12 / 5 }}>
                                 <ProductPreview
                                     id={id}
@@ -252,7 +218,7 @@ const Home = () => {
                             </Grid2>
                         ))}
                     </Grid2>
-                    {!isLoading && stats?.productCount > 0 && (
+                    {!isLoading && productCount > 0 && (
                         <Stack
                             direction="row"
                             spacing={1}
@@ -267,7 +233,7 @@ const Home = () => {
                             }}
                         >
                             <Pagination
-                                count={Math.ceil(stats.productCount / pageSize)}
+                                count={Math.ceil(productCount / pageSize)}
                                 page={pageNumber + 1}
                                 onChange={handlePageNumberChange}
                                 sx={{

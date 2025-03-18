@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
     Box,
@@ -41,6 +41,43 @@ const emptyState = Object.fromEntries(
 const pageSizes = [10, 20, 30, 40, 50];
 
 const apiUrl = "http://localhost:8080/api/products";
+const fetchProducts = (formState, pageNumber, pageSize, setIsLoading, setProducts, setProductCount, setPageCount) => {
+    setIsLoading(true);
+    setProducts([]);
+    setProductCount(0);
+    setPageCount(0);
+
+    const requestParams = new URLSearchParams({ pageNumber, pageSize });
+    controls.forEach(({ type, filters }) => {
+        filters.forEach((filter) => {
+            const value = formState[filter];
+            if (value === emptyValueMap[type]) {
+                return;
+            }
+
+            switch (type) {
+                case "autoComplete":
+                    value.forEach((el) => requestParams.append(filter, el.id));
+                    break;
+                case "dateRange":
+                    requestParams.append(filter, value.format("YYYY-MM-DD"));
+                    break;
+                default:
+                    requestParams.append(filter, value);
+            }
+        });
+    });
+
+    fetch(`${apiUrl}?${requestParams}`)
+        .then((response) => response.json())
+        .then(({ content, totalElements, totalPages }) => {
+            console.log(content)
+            setProducts(content);
+            setProductCount(totalElements);
+            setPageCount(totalPages);
+        })
+        .finally(() => setIsLoading(false));
+}
 
 const Home = () => {
     const smIsUp = useMediaQuery((theme) => theme.breakpoints.up("sm"));
@@ -58,47 +95,6 @@ const Home = () => {
     const [pageNumber, setPageNumber] = useState(0);
     const [pageCount, setPageCount] = useState(0);
 
-    const filterDTO = useMemo(() => Object.fromEntries(
-        controls.flatMap(({ type, filters }) => (
-            filters.filter((f) => formState[f] !== emptyValueMap[type]).map((f) => {
-                switch (type) {
-                    case "autoComplete":
-                        return [f, formState[f].map((el) => el.id)];
-                    case "dateRange":
-                        return [f, formState[f].format('YYYY-MM-DD')];
-                    default:
-                        return [f, formState[f]];
-                }
-            })
-        ))
-    ), [formState]);
-
-    const fetchProducts = useCallback(() => {
-        setIsLoading(true);
-        setProducts([]); // TODO: нужно ли?
-        setProductCount(0);
-        //setStats({ productCount: 0, totalAvgRating: 0 });
-
-        const requestParams = new URLSearchParams({ pageNumber, pageSize });
-        Object.entries(filterDTO).forEach(([key, value]) => (
-            Array.isArray(value) ? value.forEach((el) => requestParams.append(key, el)) : requestParams.append(key, value)
-        ));
-
-        fetch(`${apiUrl}?${requestParams}`)
-            .then((response) => response.json())
-            .then(({ content, totalElements, totalPages }) => {
-                setProducts(content);
-                setProductCount(totalElements);
-                setPageCount(totalPages);
-            })
-            .finally(() => setIsLoading(false));
-    }, [filterDTO, pageNumber, pageSize])
-
-    useEffect(() => {
-        fetchProducts();
-        // eslint-disable-next-line
-    }, [pageNumber, pageSize]);
-
     const handleOpenClick = () => {
         if (!isClosing) {
             setIsOpen(true);
@@ -112,14 +108,25 @@ const Home = () => {
 
     const handleTransitionEnd = () => setIsClosing(false);
 
-    const handleApplyClick = useCallback(() => fetchProducts(), [fetchProducts]);
+    const handleApplyClick = () => {
+        setPageNumber(0);
+        fetchProducts(formState, 0, pageSize, setIsLoading, setProducts, setProductCount, setPageCount);
+    }
 
     const handlePageSizeChange = (e) => {
         setPageSize(e.target.value);
         setPageNumber(0);
+        fetchProducts(formState, 0, e.target.value, setIsLoading, setProducts, setProductCount, setPageCount);
     }
 
-    const handlePageNumberChange = (e, v) => setPageNumber(v - 1);
+    const handlePageNumberChange = (e, v) => {
+        setPageNumber(v - 1);
+        fetchProducts(formState, v - 1, pageSize, setIsLoading, setProducts, setProductCount, setPageCount);
+    }
+
+    useEffect(() => {
+        fetchProducts(formState, pageNumber, pageSize, setIsLoading, setProducts, setProductCount, setPageCount);
+    }, []);
 
     return (
         <>
@@ -206,7 +213,7 @@ const Home = () => {
                         }}>
                             <Typography variant="button">
                                 {productCount ? (
-                                    <>Найдено <b>&nbsp;{productCount}&nbsp;</b> товаров</>
+                                    <>Найдено товаров: &nbsp;<b>{productCount}</b></>
                                 ) : (
                                     <>Товары не найдены 😔</>
                                 )}

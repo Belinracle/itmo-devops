@@ -1,8 +1,8 @@
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
-
 import { createBrowserRouter, RouterProvider } from "react-router";
+import { SnackbarProvider } from "notistack";
 
 import "@fontsource-variable/inter";
 import "dayjs/locale/ru";
@@ -20,8 +20,10 @@ const App = () => {
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
             <ThemeProvider theme={theme} defaultMode="light" noSsr>
-                <CssBaseline/>
-                <RouterProvider router={router}/>
+                <SnackbarProvider>
+                    <CssBaseline/>
+                    <RouterProvider router={router}/>
+                </SnackbarProvider>
             </ThemeProvider>
         </LocalizationProvider>
     );

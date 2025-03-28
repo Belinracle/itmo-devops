@@ -1,28 +1,14 @@
 import { useState } from "react";
-import { Box, Button, Grid2, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Button, Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { useSnackbar } from "notistack";
 
 import Navbar from "./Navbar.jsx";
 import Input from "./Input.jsx";
 
-const fields = [
-    { type: "text", name: "name", label: "Имя", placeholder: "Имя продукта" },
-    { type: "number", name: "price", label: "Цена, ₽", placeholder: "От 1 до 1000000" },
-    { type: "number", name: "avgRating", label: "Рейтинг", placeholder: "От 1 до 5" },
-    { type: "number", name: "reviewCount", label: "Количество отзывов", placeholder: "Любое число" },
-    { type: "date", name: "releaseDate", label: "Дата выпуска" },
-    { type: "number", name: "countryId", label: "Страна производства", placeholder: "От 1 до 10" },
-    { type: "number", name: "manufacturerId", label: "Производитель", placeholder: "От 1 до 100" },
-];
-
-const emptyValueMap = { text: "", number: "", date: null };
-const emptyState = Object.fromEntries(fields.map(({ type, name }) => [name, emptyValueMap[type]]));
-
 const apiUrl = "http://localhost:8080/api/products";
 
-const addProduct = (formState, setIsAdding, enqueueSnackbar) => {
-    setIsAdding(true);
+const addProduct = (formState, enqueueSnackbar) => {
     fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,38 +24,98 @@ const addProduct = (formState, setIsAdding, enqueueSnackbar) => {
         })
         .catch(() => {
             enqueueSnackbar("При добавлении произошла ошибка связи!", { variant: "error" });
-        })
-        .finally(() => setIsAdding(false));
+        });
 }
 
-const deleteProduct = (id, setIsDeleting, enqueueSnackbar) => {
-    setIsDeleting(true);
-    fetch(`${apiUrl}/${id}`, {
+const updateProduct = (formState, enqueueSnackbar) => {
+    fetch(`${apiUrl}/${formState["id"]}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formState)
+    })
+        .then((response) => {
+            if (response.ok) {
+                enqueueSnackbar(`Продукт с ID ${formState["id"]} успешно обновлен!`, { variant: "success" });
+            } else {
+                enqueueSnackbar(`При обновлении произошла ошибка! Код: ${response.status}`, { variant: "error" });
+            }
+        })
+        .catch(() => {
+            enqueueSnackbar("При обновлении произошла ошибка связи!", { variant: "error" });
+        });
+}
+
+const deleteProduct = (formState, enqueueSnackbar) => {
+    fetch(`${apiUrl}/${formState["id"]}`, {
         method: "DELETE",
     })
         .then((response) => {
             if (response.ok) {
-                enqueueSnackbar(`Продукт с ID ${id} успешно удален!`, { variant: "success" });
+                enqueueSnackbar(`Продукт с ID ${formState["id"]} успешно удален!`, { variant: "success" });
             } else {
                 enqueueSnackbar(`При удалении произошла ошибка! Код: ${response.status}`, { variant: "error" });
             }
         })
         .catch(() => {
             enqueueSnackbar("При удалении произошла ошибка связи!", { variant: "error" });
-        })
-        .finally(() => setIsDeleting(false));
+        });
 }
 
+const actions = [
+    {
+        name: "Добавление",
+        callback: addProduct,
+        fields: [
+            { type: "text", name: "name", label: "Имя", placeholder: "Имя продукта" },
+            { type: "number", name: "price", label: "Цена, ₽", placeholder: "От 1 до 1000000" },
+            { type: "number", name: "avgRating", label: "Рейтинг", placeholder: "От 1 до 5" },
+            { type: "number", name: "reviewCount", label: "Количество отзывов", placeholder: "Любое число" },
+            { type: "date", name: "releaseDate", label: "Дата выпуска", actions: [0, 1] },
+            { type: "number", name: "countryId", label: "Страна производства", placeholder: "От 1 до 10" },
+            { type: "number", name: "manufacturerId", label: "Производитель", placeholder: "От 1 до 100" },
+        ]
+    },
+    {
+        name: "Изменение",
+        callback: updateProduct,
+        fields: [
+            { type: "number", name: "id", label: "ID", placeholder: "ID продукта" },
+            { type: "text", name: "name", label: "Имя", placeholder: "Имя продукта" },
+            { type: "number", name: "price", label: "Цена, ₽", placeholder: "От 1 до 1000000" },
+            { type: "number", name: "avgRating", label: "Рейтинг", placeholder: "От 1 до 5" },
+            { type: "number", name: "reviewCount", label: "Количество отзывов", placeholder: "Любое число" },
+            { type: "date", name: "releaseDate", label: "Дата выпуска", actions: [0, 1] },
+            { type: "number", name: "countryId", label: "Страна производства", placeholder: "От 1 до 10" },
+            { type: "number", name: "manufacturerId", label: "Производитель", placeholder: "От 1 до 100" },
+        ]
+    },
+    {
+        name: "Удаление",
+        callback: deleteProduct,
+        fields: [
+            { type: "number", name: "id", label: "ID", placeholder: "ID продукта" },
+        ]
+    }
+]
+
+const emptyValueMap = { text: "", number: "", date: null };
+const emptyState = actions.map(({ fields }) => (
+    Object.fromEntries(fields.map(({ type, name }) => [name, emptyValueMap[type]])))
+);
+
 const Admin = () => {
-    const theme = useTheme();
     const { enqueueSnackbar } = useSnackbar();
 
-    const [isAdding, setIsAdding] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [action, setAction] = useState(0);
+    const [formState, setFormState] = useState(emptyState[action]);
+    const emptyFieldCount = Object.keys(formState).filter((key) => formState[key] === emptyState[action][key]).length;
 
-    const [formState, setFormState] = useState(emptyState);
-    const [id, setId] = useState("");
-    const emptyFieldCount = Object.keys(formState).filter((key) => formState[key] === emptyState[key]).length;
+    const handleActionChange = (e, v) => {
+        if (v !== null) {
+            setAction(v);
+            setFormState(emptyState[v])
+        }
+    }
 
     const handleInputChange = (name) => (
         (e) => {
@@ -83,90 +129,86 @@ const Admin = () => {
         }
     );
 
-    const handleIdChange = (e) => setId(e.target.value);
-
-    const handleResetClick = () => setFormState(emptyState);
-    const handleAddClick = () => addProduct(formState, setIsAdding, enqueueSnackbar);
-    const handleDeleteClick = () => deleteProduct(id, setIsDeleting, enqueueSnackbar);
+    const handleResetClick = () => setFormState(emptyState[action]);
+    const handleExecuteClick = () => actions[action]?.callback(formState, enqueueSnackbar);
 
     return (
         <>
             <Navbar/>
             <Box maxWidth="xl" m="auto" p={{ xs: 2, sm: 3 }}>
-                <Grid2
-                    container
-                    maxWidth={{ sm: `calc(${336 * 2}px + ${theme.spacing(3)})` }}
-                    spacing={{ xs: 2, sm: 3 }}
+                <Stack
+                    spacing={2}
+                    sx={{
+                        p: 2,
+                        maxWidth: { sm: 336 },
+                        bgcolor: 'background.paper',
+                        borderRadius: 3
+                    }}
                 >
-                    <Grid2 size={{ xs: 12, sm: 6 }}>
-                        <Stack spacing={1} sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 3 }}>
-                            <Typography variant="h6" fontWeight="bold">Добавление продукта</Typography>
-                            {fields.map(({ type, name, label, placeholder }) => (
-                                (type === "text" || type === "number") ? (
-                                    <Input
-                                        key={name}
-                                        type={type}
-                                        label={label}
-                                        value={formState[name]}
-                                        onChange={handleInputChange(name)}
-                                        placeholder={placeholder}
-                                    />
-                                ) : type === "date" ? (
-                                    <DatePicker
-                                        key={name}
-                                        disableFuture
-                                        format="DD.MM.YY"
-                                        slots={{ textField: Input }}
-                                        slotProps={{ textField: { label } }}
-                                        value={formState[name]}
-                                        onChange={handleDateChange(name)}
-                                    />
-                                ) : null
+                    <Typography variant="h6" fontWeight="bold">Управление продуктами</Typography>
+                    <Box>
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            mb={4 / 8}
+                            component={Box}
+                        >
+                            Действие
+                        </Typography>
+                        <ToggleButtonGroup
+                            fullWidth
+                            exclusive
+                            size="small"
+                            value={action}
+                            onChange={handleActionChange}
+                        >
+                            {actions?.map(({ name }, index) => (
+                                <ToggleButton key={name} value={index}>{name}</ToggleButton>
                             ))}
-                            <Stack direction="row" spacing={1} pt={1}>
-                                <Button
-                                    fullWidth
-                                    color="inherit"
-                                    variant="contained"
-                                    disabled={emptyFieldCount === fields.length}
-                                    onClick={handleResetClick}
-                                >
-                                    Сброс полей
-                                </Button>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    disabled={emptyFieldCount > 0 || isAdding || isDeleting}
-                                    onClick={handleAddClick}
-                                >
-                                    Добавить
-                                </Button>
-                            </Stack>
-                        </Stack>
-                    </Grid2>
-                    <Grid2 size={{ xs: 12, sm: 6 }}>
-                        <Stack spacing={1} sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 3 }}>
-                            <Typography variant="h6" fontWeight="bold">Удаление продукта</Typography>
+                        </ToggleButtonGroup>
+                    </Box>
+                    {actions[action]?.fields?.map(({ type, name, label, placeholder, actions }) => (
+                        (type === "text" || type === "number") ? (
                             <Input
-                                type="number"
-                                label="ID продукта"
-                                value={id}
-                                onChange={handleIdChange}
-                                placeholder="Положительное число"
+                                key={name}
+                                type={type}
+                                label={label}
+                                value={formState[name]}
+                                onChange={handleInputChange(name)}
+                                placeholder={placeholder}
                             />
-                            <Stack direction="row" spacing={1} pt={1}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    disabled={id === "" || isAdding || isDeleting}
-                                    onClick={handleDeleteClick}
-                                >
-                                    Удалить
-                                </Button>
-                            </Stack>
-                        </Stack>
-                    </Grid2>
-                </Grid2>
+                        ) : type === "date" ? (
+                            <DatePicker
+                                key={name}
+                                disableFuture
+                                format="DD.MM.YY"
+                                slots={{ textField: Input }}
+                                slotProps={{ textField: { label } }}
+                                value={formState[name]}
+                                onChange={handleDateChange(name)}
+                            />
+                        ) : null
+                    ))}
+                    <Stack direction="row" spacing={1}>
+                        <Button
+                            fullWidth
+                            color="inherit"
+                            variant="contained"
+                            disabled={emptyFieldCount === actions[action]?.fields?.length}
+                            onClick={handleResetClick}
+                        >
+                            Сброс полей
+                        </Button>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            disabled={emptyFieldCount > 0}
+                            onClick={handleExecuteClick}
+                        >
+                            Выполнить
+                        </Button>
+                    </Stack>
+                </Stack>
             </Box>
         </>
     );

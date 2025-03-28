@@ -1,7 +1,7 @@
 package ru.itmo.devops.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -20,23 +20,29 @@ public class ProductController {
     private final ProductMapper productMapper;
     private final ProductService productService;
 
+    @PostMapping
+    ResponseEntity<Long> addProduct(@RequestBody @Valid ProductDTO product) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.save(productMapper.toEntity(product)).getId());
+    }
+
     @GetMapping
     ResponseEntity<Page<ProductDTO>> getAllProducts(@ModelAttribute @Valid FilterDTO filter) {
         return ResponseEntity.ok(productService.findAllMatching(filter).map(productMapper::toDTO));
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<ProductDTO> getProductById(@PathVariable @PositiveOrZero Long id) {
+    ResponseEntity<ProductDTO> getProductById(@PathVariable @Positive Long id) {
         return ResponseEntity.ok(productMapper.toDTO(productService.findById(id)));
     }
 
-    @PostMapping
-    ResponseEntity<Long> addProduct(@RequestBody @Valid ProductDTO product) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.save(productMapper.toEntity(product)).getId());
+    @PutMapping("/{id}")
+    ResponseEntity<Void> updateProduct(@PathVariable @Positive Long id, @RequestBody @Valid ProductDTO product) {
+        productService.updateById(id, productMapper.toEntity(product));
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Void> deleteProduct(@PathVariable @PositiveOrZero Long id) {
+    ResponseEntity<Void> deleteProduct(@PathVariable @Positive Long id) {
         productService.deleteById(id);
         return ResponseEntity.ok().build();
     }

@@ -21,8 +21,12 @@ public class ProductService {
         return productRepository.save(productEntity);
     }
 
-    public void deleteById(Long id) {
-        productRepository.deleteById(id);
+    public Page<ProductEntity> findAllMatching(FilterDTO filter) {
+        int pageSize = filter.pageSize() != null ? filter.pageSize() : 10;
+        int pageNumber = filter.pageNumber() != null ? filter.pageNumber() : 0;
+        var pageable = PageRequest.of(pageNumber, pageSize);
+        var specification = buildSpecification(filter);
+        return productRepository.findAll(specification, pageable);
     }
 
     public ProductEntity findById(Long id) {
@@ -30,12 +34,14 @@ public class ProductService {
                 .orElseThrow(() -> new NoSuchElementException("Product with id " + id + " not found"));
     }
 
-    public Page<ProductEntity> findAllMatching(FilterDTO filter) {
-        int pageSize = filter.pageSize() != null ? filter.pageSize() : 10;
-        int pageNumber = filter.pageNumber() != null ? filter.pageNumber() : 0;
-        var pageable = PageRequest.of(pageNumber, pageSize);
-        var specification = buildSpecification(filter);
-        return productRepository.findAll(specification, pageable);
+    public void updateById(Long id, ProductEntity productEntity) {
+        findById(id);
+        productEntity.setId(id);
+        save(productEntity);
+    }
+
+    public void deleteById(Long id) {
+        productRepository.delete(findById(id));
     }
 
     private Specification<ProductEntity> buildSpecification(FilterDTO filter) {

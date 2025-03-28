@@ -8,12 +8,9 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import ru.itmo.devops.dto.ProductDTO;
 import ru.itmo.devops.entity.ProductEntity;
 import ru.itmo.devops.repository.ProductRepository;
 
@@ -23,8 +20,6 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -80,8 +75,8 @@ class ProductControllerTest {
                 .when()
                 .get("api/products").as(new TypeRef<>() {
                 });
-        val productList = (List<String>)productsResponse.get("content");
-        assertEquals(4,productList.size());
+        val productList = (List<String>) productsResponse.get("content");
+        assertEquals(4, productList.size());
     }
 
     @Test
@@ -144,9 +139,9 @@ class ProductControllerTest {
                 .contentType(ContentType.JSON)
                 .body(productRequest)
                 .when()
-                .post("api/products")
+                .put("api/products/1")
                 .then()
-                .statusCode(201);
+                .statusCode(200);
 
         long productCount = productRepository.count();
         assertEquals(4, productCount);

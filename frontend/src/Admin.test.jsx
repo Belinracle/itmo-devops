@@ -28,7 +28,7 @@ const product = {
     price: "100000",
     avgRating: "4.9",
     reviewCount: "10000",
-    releaseDate: "2024-09-08T21:00:00.000Z",
+    releaseDate: "2024-09-09",
     countryId: "2",
     manufacturerId: "3",
 }

@@ -9,10 +9,15 @@ import Input from "./Input.jsx";
 const apiUrl = "http://localhost:8080/api/products";
 
 const addProduct = (formState, enqueueSnackbar) => {
+    let payload = { ...formState };
+    Object.entries(formState)
+        .filter(([, value]) => value["$isDayjsObject"])
+        .forEach(([key, value]) => payload[key] = value.format("YYYY-MM-DD"));
+
     fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formState)
+        body: JSON.stringify(payload)
     })
         .then((response) => response.text().then((text) => ({ response, text })))
         .then(({ response, text }) => {
@@ -28,10 +33,15 @@ const addProduct = (formState, enqueueSnackbar) => {
 }
 
 const updateProduct = (formState, enqueueSnackbar) => {
+    let payload = { ...formState };
+    Object.entries(formState)
+        .filter(([, value]) => value["$isDayjsObject"])
+        .forEach(([key, value]) => payload[key] = value.format("YYYY-MM-DD"));
+
     fetch(`${apiUrl}/${formState["id"]}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formState)
+        body: JSON.stringify(payload)
     })
         .then((response) => {
             if (response.ok) {

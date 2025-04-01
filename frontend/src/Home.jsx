@@ -71,7 +71,6 @@ const fetchProducts = (formState, pageNumber, pageSize, setIsLoading, setProduct
     fetch(`${apiUrl}?${requestParams}`)
         .then((response) => response.json())
         .then(({ content, totalElements, totalPages }) => {
-            console.log(content)
             setProducts(content);
             setProductCount(totalElements);
             setPageCount(totalPages);
@@ -264,6 +263,7 @@ const Home = () => {
                                     variant="outlined"
                                     value={pageSize}
                                     onChange={handlePageSizeChange}
+                                    MenuProps={{ keepMounted: true }}
                                     sx={{
                                         [`.${selectClasses.root}`]: { flex: 1 },
                                         [`.${selectClasses.select}`]: { px: 1, py: 0, fontSize: 'body2.fontSize' },

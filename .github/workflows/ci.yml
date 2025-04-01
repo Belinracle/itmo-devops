@@ -4,8 +4,8 @@ on:
     branches:
       - '**'
 jobs:
-  build:
-    name: Maven Build
+  backendBuild:
+    name: Maven backend Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -18,7 +18,7 @@ jobs:
       - name: Build with Maven
         working-directory: ./backend
         run: mvn compile
-  test:
+  backendTest:
     name: Maven Test
     runs-on: ubuntu-latest
     steps:
@@ -32,3 +32,15 @@ jobs:
       - name: Test with maven
         working-directory: ./backend
         run: mvn test
+  frontendTest:
+    name: Frontend Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm test

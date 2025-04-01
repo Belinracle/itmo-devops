@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -23,28 +23,109 @@ const renderWithContext = () => render(
 );
 
 describe("Admin component", () => {
-    it("Должен рендериться", () => {
+    let addButton, updateButton, deleteButton;
+    let id, name, price, avgRating, reviewCount, releaseDate, countryId, manufacturerId;
+
+    beforeEach(() => {
         renderWithContext();
-        expect(screen.getByText("Управление продуктами")).toBeInTheDocument();
+        addButton = screen.getByText("Добавление");
+        updateButton = screen.getByText("Изменение");
+        deleteButton = screen.getByText("Удаление");
+    });
+
+    describe("Режим добавления", () => {
+        beforeEach(() => {
+            id = screen.queryByLabelText("ID");
+            name = screen.queryByLabelText("Имя");
+            price = screen.queryByLabelText("Цена, ₽");
+            avgRating = screen.queryByLabelText("Рейтинг");
+            reviewCount = screen.queryByLabelText("Количество отзывов");
+            releaseDate = screen.queryByLabelText("Дата выпуска");
+            countryId = screen.queryByLabelText("Страна производства");
+            manufacturerId = screen.queryByLabelText("Производитель");
+        });
+
+        it("Должен быть выбран по умолчанию", () => {
+            expect(addButton).toHaveAttribute("aria-pressed", "true");
+            expect(updateButton).toHaveAttribute("aria-pressed", "false");
+            expect(deleteButton).toHaveAttribute("aria-pressed", "false");
+        });
+
+        it("Должен позволять изменить все параметры, кроме id", () => {
+            expect(id).not.toBeInTheDocument();
+            expect(name).toBeInTheDocument();
+            expect(price).toBeInTheDocument();
+            expect(avgRating).toBeInTheDocument();
+            expect(reviewCount).toBeInTheDocument();
+            expect(releaseDate).toBeInTheDocument();
+            expect(countryId).toBeInTheDocument();
+            expect(manufacturerId).toBeInTheDocument();
+        });
+    });
+
+    describe("Режим изменения", () => {
+        beforeEach(() => {
+            fireEvent.click(updateButton);
+            id = screen.queryByLabelText("ID");
+            name = screen.queryByLabelText("Имя");
+            price = screen.queryByLabelText("Цена, ₽");
+            avgRating = screen.queryByLabelText("Рейтинг");
+            reviewCount = screen.queryByLabelText("Количество отзывов");
+            releaseDate = screen.queryByLabelText("Дата выпуска");
+            countryId = screen.queryByLabelText("Страна производства");
+            manufacturerId = screen.queryByLabelText("Производитель");
+        });
+
+        it("Должен быть включен после нажатии кнопки \"Изменение\"", () => {
+            expect(addButton).toHaveAttribute("aria-pressed", "false");
+            expect(updateButton).toHaveAttribute("aria-pressed", "true");
+            expect(deleteButton).toHaveAttribute("aria-pressed", "false");
+        });
+
+        it("Должен позволять изменить все параметры", () => {
+            expect(id).toBeInTheDocument();
+            expect(name).toBeInTheDocument();
+            expect(price).toBeInTheDocument();
+            expect(avgRating).toBeInTheDocument();
+            expect(reviewCount).toBeInTheDocument();
+            expect(releaseDate).toBeInTheDocument();
+            expect(countryId).toBeInTheDocument();
+            expect(manufacturerId).toBeInTheDocument();
+        });
+    });
+
+    describe("Режим удаления", () => {
+        beforeEach(() => {
+            fireEvent.click(deleteButton);
+            id = screen.queryByLabelText("ID");
+            name = screen.queryByLabelText("Имя");
+            price = screen.queryByLabelText("Цена, ₽");
+            avgRating = screen.queryByLabelText("Рейтинг");
+            reviewCount = screen.queryByLabelText("Количество отзывов");
+            releaseDate = screen.queryByLabelText("Дата выпуска");
+            countryId = screen.queryByLabelText("Страна производства");
+            manufacturerId = screen.queryByLabelText("Производитель");
+        });
+
+        it("Должен быть включен после нажатии кнопки \"Удаление\"", () => {
+            expect(addButton).toHaveAttribute("aria-pressed", "false");
+            expect(updateButton).toHaveAttribute("aria-pressed", "false");
+            expect(deleteButton).toHaveAttribute("aria-pressed", "true");
+        });
+
+        it("Должен позволять изменить только id", () => {
+            expect(id).toBeInTheDocument();
+            expect(name).not.toBeInTheDocument();
+            expect(price).not.toBeInTheDocument();
+            expect(avgRating).not.toBeInTheDocument();
+            expect(reviewCount).not.toBeInTheDocument();
+            expect(releaseDate).not.toBeInTheDocument();
+            expect(countryId).not.toBeInTheDocument();
+            expect(manufacturerId).not.toBeInTheDocument();
+        });
     });
 
     /*
-
-    it("должен переключать действия", () => {
-        render(
-            <SnackbarProvider>
-                <Admin/>
-            </SnackbarProvider>
-        );
-
-        const addButton = screen.getByText("Добавление");
-        const updateButton = screen.getByText("Изменение");
-
-        fireEvent.click(updateButton);
-        expect(updateButton).toHaveAttribute("aria-pressed", "true");
-        expect(addButton).toHaveAttribute("aria-pressed", "false");
-    });
-
     it("должен отправлять запрос при клике", async () => {
         render(
             <SnackbarProvider>

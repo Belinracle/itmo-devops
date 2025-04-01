@@ -170,6 +170,7 @@ const Admin = () => {
                     {actions[action]?.fields?.map(({ type, name, label, placeholder, actions }) => (
                         (type === "text" || type === "number") ? (
                             <Input
+                                id={name}
                                 key={name}
                                 type={type}
                                 label={label}
@@ -183,7 +184,7 @@ const Admin = () => {
                                 disableFuture
                                 format="DD.MM.YY"
                                 slots={{ textField: Input }}
-                                slotProps={{ textField: { label } }}
+                                slotProps={{ textField: { label, id: name } }}
                                 value={formState[name]}
                                 onChange={handleDateChange(name)}
                             />

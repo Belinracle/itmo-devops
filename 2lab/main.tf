@@ -38,6 +38,20 @@ resource "libvirt_network" "vm_network" {
   }
 }
 
+# Настройка Cloud-Init
+resource "libvirt_cloudinit_disk" "common_init" {
+  name           = "commoninit.iso"
+  pool           = libvirt_pool.default.name
+  user_data      = data.template_file.user_data.rendered
+  network_config = <<EOF
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: true
+EOF
+}
+
 # Виртуальная машина
 resource "libvirt_domain" "vm" {
   name = "my-vm"
@@ -55,20 +69,20 @@ resource "libvirt_domain" "vm" {
     volume_id = libvirt_volume.ubuntu-qcow2.id
   }
 
+  # Подключение Cloud-Init ISO
+  disk {
+    volume_id = libvirt_cloudinit_disk.common_init.id
+  }
+
   # Графический вывод (опционально)
   graphics {
     type        = "spice"
     listen_type = "address"
     autoport    = true
   }
-
-  # Настройка пользователя через Cloud-Init (с паролем)
-  cloudinit {
-    user_data = data.template_file.user_data.rendered
-  }
 }
 
-# Шаблон Cloud-Init для настройки пользователя с паролем password
+# Шаблон Cloud-Init для настройки пользователя с паролем
 data "template_file" "user_data" {
   template = <<EOF
 #cloud-config
@@ -77,6 +91,6 @@ users:
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     groups: sudo
     shell: /bin/bash
-    passwd: "$6$rounds=4096$GTyL8/A2Rl6XWgSP$DGo8nKsZwv5Fh7L.XqKjVmPcmbJfh9ncEeEcE1kp/4fJ3UPjDQ3h2dhdWWblf0njmbrRytqgT8LE/He45pw/N0" # Хэш пароля
+    passwd: "\$6\$rounds=4096\$random_salt\$hashed_password" # Хэш пароля
 EOF
 }

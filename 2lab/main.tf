@@ -64,7 +64,7 @@ resource "random_string" "suffix" {
 
 # Виртуальная машина
 resource "libvirt_domain" "vm" {
-  depends_on = [libvirt_cloudinit_disk.common_init.id]
+  depends_on = [libvirt_cloudinit_disk.common_init]
   name = "my-vm"
 
   memory = 2048

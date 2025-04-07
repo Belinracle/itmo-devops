@@ -15,15 +15,17 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
-# Использование существующего пула хранения
-data "libvirt_pool" "default" {
+# Создание пула хранения (или используйте имя существующего пула)
+resource "libvirt_pool" "default" {
   name = "default"
+  type = "dir"
+  path = "/var/lib/libvirt/images"
 }
 
 # Загрузка ISO-образа операционной системы
 resource "libvirt_volume" "ubuntu-qcow2" {
   name   = "ubuntu.qcow2"
-  pool   = data.libvirt_pool.default.name
+  pool   = libvirt_pool.default.name
   format = "qcow2"
   source = "https://releases.ubuntu.com/22.04/ubuntu-22.04.5-live-server-amd64.iso"
 }
@@ -43,7 +45,7 @@ resource "libvirt_network" "vm_network" {
 # Настройка Cloud-Init с уникальным именем ISO
 resource "libvirt_cloudinit_disk" "common_init" {
   name           = "commoninit-${random_string.suffix.result}.iso"
-  pool           = data.libvirt_pool.default.name
+  pool           = libvirt_pool.default.name
   user_data      = data.template_file.user_data.rendered
   network_config = <<EOF
 network:

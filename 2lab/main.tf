@@ -101,6 +101,7 @@ users:
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     groups: sudo
     shell: /bin/bash
-    passwd: "\$6\$rounds=4096\$GTyL8/A2Rl6XWgSP\$DGo8nKsZwv5Fh7L.XqKjVmPcmbJfh9ncEeEcE1kp/4fJ3UPjDQ3h2dhdWWblf0njmbrRytqgT8LE/He45pw/N0" # Хэш пароля
+    ssh_authorized_keys:
+      - ${file("~/.ssh/id_rsa.pub")} # Путь к вашему публичному SSH-ключу
 EOF
 }

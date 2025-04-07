@@ -26,3 +26,11 @@ sudo virsh pool-autostart default
 
 # Проверка состояния пула
 sudo virsh pool-list --all
+
+проверить жива ли вм 
+
+sudo virsh dominfo my-vm
+
+получить айпишник вмки 
+
+sudo virsh domifaddr my-vm

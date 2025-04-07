@@ -42,20 +42,6 @@ resource "libvirt_network" "vm_network" {
   }
 }
 
-# Настройка Cloud-Init с уникальным именем ISO
-resource "libvirt_cloudinit_disk" "common_init" {
-  name           = "commoninit-${random_string.suffix.result}.iso"
-  pool           = libvirt_pool.default.name
-  user_data      = data.template_file.user_data.rendered
-  network_config = <<EOF
-network:
-  version: 2
-  ethernets:
-    eth0:
-      dhcp4: true
-EOF
-}
-
 # Генерация случайного суффикса
 resource "random_string" "suffix" {
   length  = 8
@@ -90,6 +76,20 @@ resource "libvirt_domain" "vm" {
     listen_type = "address"
     autoport    = true
   }
+}
+
+# Настройка Cloud-Init с уникальным именем ISO
+resource "libvirt_cloudinit_disk" "common_init" {
+  name           = "commoninit.iso"
+  pool           = libvirt_pool.default.name
+  user_data      = data.template_file.user_data.rendered
+  network_config = <<EOF
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: true
+EOF
 }
 
 # Шаблон Cloud-Init для настройки пользователя с паролем

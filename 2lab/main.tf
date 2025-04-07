@@ -28,9 +28,16 @@ resource "libvirt_volume" "ubuntu-qcow2" {
   source = "https://releases.ubuntu.com/22.04/ubuntu-22.04.5-live-server-amd64.iso"
 }
 
-# Использование существующей сети
-data "libvirt_network" "default" {
-  name = "default"
+# Создание новой сети (или используйте UUID существующей)
+resource "libvirt_network" "vm_network" {
+  name      = "vm-network"
+  mode      = "nat"
+  autostart = true
+
+  addresses = ["192.168.122.0/24"]
+  dhcp {
+    enabled = true
+  }
 }
 
 # Настройка Cloud-Init с уникальным именем ISO
@@ -62,7 +69,7 @@ resource "libvirt_domain" "vm" {
 
   # Назначение сети
   network_interface {
-    network_id = data.libvirt_network.default.id
+    network_id = libvirt_network.vm_network.id
   }
 
   # Диск для виртуальной машины

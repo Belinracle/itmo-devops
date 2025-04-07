@@ -4,6 +4,10 @@ terraform {
       source  = "dmacvicar/libvirt"
       version = "~> 0.7.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 }
 
@@ -11,36 +15,27 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
-# Создание пула хранения (если его нет)
-resource "libvirt_pool" "default" {
+# Использование существующего пула хранения
+data "libvirt_pool" "default" {
   name = "default"
-  type = "dir"
-  path = "/var/lib/libvirt/images"
 }
 
 # Загрузка ISO-образа операционной системы
 resource "libvirt_volume" "ubuntu-qcow2" {
   name   = "ubuntu.qcow2"
-  pool   = libvirt_pool.default.name
+  pool   = data.libvirt_pool.default.name
   format = "qcow2"
   source = "https://releases.ubuntu.com/22.04/ubuntu-22.04.5-live-server-amd64.iso"
 }
 
-# Сеть для виртуальной машины
-resource "libvirt_network" "vm_network" {
-  name      = "vm-network"
-  mode      = "nat" # Можно использовать "bridge" для мостового режима
-  autostart = true
-
-  addresses = ["192.168.122.0/24"]
-  dhcp {
-    enabled = true
-  }
+# Использование существующей сети
+data "libvirt_network" "default" {
+  name = "default"
 }
 
-# Настройка Cloud-Init
+# Настройка Cloud-Init с уникальным именем ISO
 resource "libvirt_cloudinit_disk" "common_init" {
-  name           = "commoninit-${timestamp()}.iso"
+  name           = "commoninit-${random_string.suffix.result}.iso"
   pool           = data.libvirt_pool.default.name
   user_data      = data.template_file.user_data.rendered
   network_config = <<EOF
@@ -52,6 +47,12 @@ network:
 EOF
 }
 
+# Генерация случайного суффикса
+resource "random_string" "suffix" {
+  length  = 8
+  special = false
+}
+
 # Виртуальная машина
 resource "libvirt_domain" "vm" {
   name = "my-vm"
@@ -61,7 +62,7 @@ resource "libvirt_domain" "vm" {
 
   # Назначение сети
   network_interface {
-    network_id = libvirt_network.vm_network.id
+    network_id = data.libvirt_network.default.id
   }
 
   # Диск для виртуальной машины

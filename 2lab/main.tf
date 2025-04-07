@@ -44,7 +44,7 @@ resource "libvirt_network" "vm_network" {
 
 # Настройка Cloud-Init с уникальным именем ISO
 resource "libvirt_cloudinit_disk" "common_init" {
-  name           = "commoninit-${random_string.suffix.result}.iso"
+  name           = "commoninit.iso"
   pool           = libvirt_pool.default.name
   user_data      = data.template_file.user_data.rendered
   network_config = <<EOF
@@ -56,18 +56,12 @@ network:
 EOF
 }
 
-# Генерация случайного суффикса
-resource "random_string" "suffix" {
-  length  = 8
-  special = false
-}
-
 # Виртуальная машина
 resource "libvirt_domain" "vm" {
   depends_on = [libvirt_cloudinit_disk.common_init]
   name = "my-vm"
 
-  memory = 2048
+  memory = 2048 * 10
   vcpu   = 2
 
   # Назначение сети
@@ -75,14 +69,14 @@ resource "libvirt_domain" "vm" {
     network_id = libvirt_network.vm_network.id
   }
 
-  # Диск для виртуальной машины
-  disk {
-    volume_id = libvirt_volume.ubuntu-qcow2.id
-  }
-
   # Подключение Cloud-Init ISO
   disk {
     volume_id = libvirt_cloudinit_disk.common_init.id
+  }
+
+  # Диск для виртуальной машины
+  disk {
+    volume_id = libvirt_volume.ubuntu-qcow2.id
   }
 
   # Графический вывод (SPICE)

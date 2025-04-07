@@ -2,7 +2,7 @@ terraform {
   required_providers {
     libvirt = {
       source  = "dmacvicar/libvirt"
-      version = "~> 0.8.0"
+      version = "~> 0.8.0" # Убедитесь, что версия совместима с вашей системой
     }
     random = {
       source  = "hashicorp/random"
@@ -15,7 +15,7 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
-# Создание пула хранения (или используйте имя существующего пула)
+# Создание пула хранения
 resource "libvirt_pool" "default" {
   name = "default"
   type = "dir"
@@ -30,7 +30,7 @@ resource "libvirt_volume" "ubuntu-qcow2" {
   source = "https://releases.ubuntu.com/22.04/ubuntu-22.04.5-live-server-amd64.iso"
 }
 
-# Создание новой сети (или используйте UUID существующей)
+# Создание новой сети (NAT)
 resource "libvirt_network" "vm_network" {
   name      = "vm-network"
   mode      = "nat"
@@ -40,6 +40,20 @@ resource "libvirt_network" "vm_network" {
   dhcp {
     enabled = true
   }
+}
+
+# Настройка Cloud-Init с уникальным именем ISO
+resource "libvirt_cloudinit_disk" "common_init" {
+  name           = "commoninit-${random_string.suffix.result}.iso"
+  pool           = libvirt_pool.default.name
+  user_data      = data.template_file.user_data.rendered
+  network_config = <<EOF
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: true
+EOF
 }
 
 # Генерация случайного суффикса
@@ -65,34 +79,33 @@ resource "libvirt_domain" "vm" {
     volume_id = libvirt_volume.ubuntu-qcow2.id
   }
 
-#   # Подключение Cloud-Init ISO
-#   disk {
-#     volume_id = libvirt_cloudinit_disk.common_init.id
-#   }
+  # Подключение Cloud-Init ISO
+  disk {
+    volume_id = libvirt_cloudinit_disk.common_init.id
+  }
 
-  # Графический вывод (опционально)
+  # Графический вывод (SPICE)
   graphics {
     type        = "spice"
     listen_type = "address"
     autoport    = true
   }
+
+  # Настройка последовательного порта (для текстовой консоли)
+  console {
+    type        = "pty"
+    target_port = "0"
+    target_type = "serial"
+  }
+
+  console {
+    type        = "pty"
+    target_port = "1"
+    target_type = "virtio"
+  }
 }
 
-# Настройка Cloud-Init с уникальным именем ISO
-resource "libvirt_cloudinit_disk" "common_init" {
-  name           = "commoninit.iso"
-  pool           = libvirt_pool.default.name
-  user_data      = data.template_file.user_data.rendered
-  network_config = <<EOF
-network:
-  version: 2
-  ethernets:
-    eth0:
-      dhcp4: true
-EOF
-}
-
-# Шаблон Cloud-Init для настройки пользователя с паролем
+# Шаблон Cloud-Init для настройки пользователя и последовательной консоли
 data "template_file" "user_data" {
   template = <<EOF
 #cloud-config
@@ -103,5 +116,14 @@ users:
     shell: /bin/bash
     ssh_authorized_keys:
       - ${file("~/.ssh/id_rsa.pub")} # Путь к вашему публичному SSH-ключу
+
+# Настройка последовательной консоли
+bootcmd:
+  - echo "GRUB_CMDLINE_LINUX_DEFAULT='console=ttyS0 console=tty1'" >> /etc/default/grub
+  - update-grub
+
+runcmd:
+  - systemctl enable serial-getty@ttyS0.service
+  - systemctl start serial-getty@ttyS0.service
 EOF
 }

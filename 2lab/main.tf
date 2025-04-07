@@ -65,10 +65,10 @@ resource "libvirt_domain" "vm" {
     volume_id = libvirt_volume.ubuntu-qcow2.id
   }
 
-  # Подключение Cloud-Init ISO
-  disk {
-    volume_id = libvirt_cloudinit_disk.common_init.id
-  }
+#   # Подключение Cloud-Init ISO
+#   disk {
+#     volume_id = libvirt_cloudinit_disk.common_init.id
+#   }
 
   # Графический вывод (опционально)
   graphics {

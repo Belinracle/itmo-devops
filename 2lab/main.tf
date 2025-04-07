@@ -40,8 +40,8 @@ resource "libvirt_network" "vm_network" {
 
 # Настройка Cloud-Init
 resource "libvirt_cloudinit_disk" "common_init" {
-  name           = "commoninit.iso"
-  pool           = libvirt_pool.default.name
+  name           = "commoninit-${timestamp()}.iso"
+  pool           = data.libvirt_pool.default.name
   user_data      = data.template_file.user_data.rendered
   network_config = <<EOF
 network:
@@ -91,6 +91,6 @@ users:
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     groups: sudo
     shell: /bin/bash
-    passwd: "\$6\$rounds=4096\$random_salt\$hashed_password" # Хэш пароля
+    passwd: "$6$rounds=4096$GTyL8/A2Rl6XWgSP$DGo8nKsZwv5Fh7L.XqKjVmPcmbJfh9ncEeEcE1kp/4fJ3UPjDQ3h2dhdWWblf0njmbrRytqgT8LE/He45pw/N0" # Хэш пароля
 EOF
 }

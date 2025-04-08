@@ -37,6 +37,17 @@ resource "libvirt_cloudinit_disk" "commoninit" {
   network_config = data.template_file.network_config.rendered
 }
 
+resource "libvirt_network" "vm_network" {
+  name      = "vm-network"
+  mode      = "nat"
+  autostart = true
+
+  addresses = ["192.168.122.0/24"]
+  dhcp {
+    enabled = true
+  }
+}
+
 resource "libvirt_domain" "vm" {
   name   = "${var.prefix}master"
   memory = var.vm.ram
@@ -53,7 +64,7 @@ resource "libvirt_domain" "vm" {
   }
 
   network_interface {
-    bridge         = var.vm.bridge
+    network_id = libvirt_network.vm_network.id
     wait_for_lease = true
   }
 

@@ -3,8 +3,8 @@ prefix = "devopsVM-"
 pool_path = "/var/lib/libvirt/"
 
 image = {
-  name = "ubuntu-22_04"
-  url  = "https://releases.ubuntu.com/22.04/ubuntu-22.04.5-live-server-amd64.iso"
+  name = "ubuntu-focal"
+  url  = "https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img"
 }
 
 vm = {

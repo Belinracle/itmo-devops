@@ -63,8 +63,4 @@ resource "libvirt_domain" "vm" {
     type        = "vnc"
     listen_type = "address"
   }
-
-  xml {
-    xslt = file("${path.module}/ubuntu_20_04/hostfwd.xsl")
-  }
 }

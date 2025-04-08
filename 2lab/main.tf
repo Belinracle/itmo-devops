@@ -1,3 +1,7 @@
+provider "libvirt" {
+  uri = "qemu:///system"
+}
+
 resource "libvirt_pool" "pool" {
   name = "${var.prefix}pool"
   type = "dir"

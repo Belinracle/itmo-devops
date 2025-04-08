@@ -53,7 +53,7 @@ resource "libvirt_domain" "vm" {
   }
 
   network_interface {
-    network_name   = "default"
+    bridge         = var.vm.bridge
     wait_for_lease = true
   }
 

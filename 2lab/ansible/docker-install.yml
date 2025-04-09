@@ -1,5 +1,5 @@
 ---
-- name: Установка Docker на Ubuntu
+- name: Установка Docker и Docker Compose на Ubuntu
   hosts: all
   become: yes  # Использование привилегий root
   tasks:
@@ -55,9 +55,9 @@
 
     - name: Установка Docker Compose
       get_url:
-      url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64
-      dest: /usr/local/bin/docker-compose
-      mode: '0755'
+        url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
 
     - name: Проверка версии Docker Compose
       command: docker-compose --version

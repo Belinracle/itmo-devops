@@ -52,3 +52,17 @@
     - name: Вывод версии Docker
       debug:
         msg: "Docker успешно установлен. Версия: {{ docker_version.stdout }}"
+
+    - name: Установка Docker Compose
+      get_url:
+      url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64
+      dest: /usr/local/bin/docker-compose
+      mode: '0755'
+
+    - name: Проверка версии Docker Compose
+      command: docker-compose --version
+      register: docker_compose_version
+
+    - name: Вывод версии Docker Compose
+      debug:
+        msg: "Docker Compose успешно установлен. Версия: {{ docker_compose_version.stdout }}"

@@ -6,7 +6,8 @@ import { useSnackbar } from "notistack";
 import Navbar from "./Navbar.jsx";
 import Input from "./Input.jsx";
 
-const apiUrl = "http://localhost:8080/api/products";
+const backendUrl = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8080";
+const apiUrl = `${backendUrl}/api/products`;
 
 const addProduct = (formState, enqueueSnackbar) => {
     let payload = { ...formState };

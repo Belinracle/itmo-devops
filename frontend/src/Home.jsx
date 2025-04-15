@@ -40,7 +40,8 @@ const emptyState = Object.fromEntries(
 
 const pageSizes = [10, 20, 30, 40, 50];
 
-const apiUrl = "http://localhost:8080/api/products";
+const backendUrl = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8080";
+const apiUrl = `${backendUrl}/api/products`;
 const fetchProducts = (formState, pageNumber, pageSize, setIsLoading, setProducts, setProductCount, setPageCount) => {
     setIsLoading(true);
     setProducts([]);

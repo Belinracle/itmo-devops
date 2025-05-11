@@ -87,7 +87,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository }}/devops-backend:latest
+          tags: ghcr.io/belinracle/itmo-devops/devops-backend:latest
 
       - name: Build and push Frontend image
         uses: docker/build-push-action@v5
@@ -95,4 +95,4 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository }}/devops-frontend:latest
+          tags: ghcr.io/belinracle/itmo-devops/devops-frontend:latest

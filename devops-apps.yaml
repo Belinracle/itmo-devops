@@ -1,5 +1,5 @@
 ---
-# Deployment для backend
+# Deployment для Backend
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,13 +14,18 @@ spec:
       labels:
         app: devops-backend
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
         - name: devops-backend
-          image: devops-backend:latest
+          image: ghcr.io/belinracle/itmo-devops/devops-backend:latest
           ports:
-            - containerPort: 8080  # Порт твоего бэкенда
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
 ---
-# Service для backend
+# Service для Backend
 apiVersion: v1
 kind: Service
 metadata:
@@ -32,10 +37,10 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 3000
-      nodePort: 30001  # внешний порт для доступа к backend
+      targetPort: 8080
+      nodePort: 30001
 ---
-# Deployment для frontend
+# Deployment для Frontend
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -50,13 +55,18 @@ spec:
       labels:
         app: devops-frontend
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
         - name: devops-frontend
-          image: devops-frontend:latest
+          image: ghcr.io/belinracle/itmo-devops/devops-frontend:latest
           ports:
-            - containerPort: 80  # например, Nginx или React-фронтенд
+            - containerPort: 3000  # Исправлено на 3000
+          env:
+            - name: VITE_BACKEND_URL
+              value: "http://devops-backend-service:8080"
 ---
-# Service для frontend
+# Service для Frontend
 apiVersion: v1
 kind: Service
 metadata:
@@ -68,5 +78,5 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 80
-      nodePort: 30080  # внешний порт для доступа к фронтенду
+      targetPort: 3000   # Исправлено на 3000
+      nodePort: 30080

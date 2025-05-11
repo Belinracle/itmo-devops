@@ -1,5 +1,80 @@
 ---
-# Deployment для Backend
+# === PostgreSQL Persistent Volume ===
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /data/postgres
+---
+# === PostgreSQL Persistent Volume Claim ===
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+# === PostgreSQL Deployment (называем devops-postgres) ===
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devops-postgres
+  template:
+    metadata:
+      labels:
+        app: devops-postgres
+    spec:
+      containers:
+        - name: devops-postgres
+          image: postgres:14.17-alpine
+          env:
+            - name: POSTGRES_USER
+              value: "postgres_user"
+            - name: POSTGRES_PASSWORD
+              value: "postgres_password"
+            - name: POSTGRES_DB
+              value: "postgres_db"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+---
+# === PostgreSQL Service ===
+apiVersion: v1
+kind: Service
+metadata:
+  name: devops-postgres
+spec:
+  selector:
+    app: devops-postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+# === Backend Deployment ===
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,10 +97,16 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://devops-postgres:5432/postgres_db"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "postgres_user"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "postgres_password"
             - name: SPRING_PROFILES_ACTIVE
               value: "prod"
 ---
-# Service для Backend
+# === Backend Service ===
 apiVersion: v1
 kind: Service
 metadata:
@@ -40,7 +121,7 @@ spec:
       targetPort: 8080
       nodePort: 30001
 ---
-# Deployment для Frontend
+# === Frontend Deployment ===
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -61,12 +142,12 @@ spec:
         - name: devops-frontend
           image: ghcr.io/belinracle/itmo-devops/devops-frontend:latest
           ports:
-            - containerPort: 3000  # Исправлено на 3000
+            - containerPort: 3000
           env:
-            - name: VITE_BACKEND_URL
-              value: "http://devops-backend-service:8080"
+            - name: API_URL
+              value: "http://devops-backend-service"
 ---
-# Service для Frontend
+# === Frontend Service ===
 apiVersion: v1
 kind: Service
 metadata:
@@ -78,5 +159,5 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 3000   # Исправлено на 3000
+      targetPort: 3000
       nodePort: 30080

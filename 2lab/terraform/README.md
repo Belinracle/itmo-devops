@@ -1,3 +1,5 @@
+туториал https://blog.ionice.ru/terraform-kvm-part1
+
 удалить существующий пул
 
 sudo virsh pool-destroy default

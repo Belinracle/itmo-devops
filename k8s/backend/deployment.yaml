@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devops-backend
+  template:
+    metadata:
+      labels:
+        app: devops-backend
+    spec:
+      containers:
+        - name: devops-backend
+          image: ghcr.io/belinracle/itmo-devops/devops-backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://devops-postgres:5432/postgres_db"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "postgres_user"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "postgres_password"

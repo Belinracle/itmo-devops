@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devops-frontend
+  template:
+    metadata:
+      labels:
+        app: devops-frontend
+    spec:
+      containers:
+        - name: devops-frontend
+          image: ghcr.io/belinracle/itmo-devops/devops-frontend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: API_URL
+              value: "http://devops-backend-service"

@@ -1,9 +1,24 @@
 server:
   port: 8080
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    tags:
+      application:
+        name: ${spring.application.name}
+  health:
+    liveness:
+      enabled: true
+    readiness:
+      enabled: true
+
 spring:
   application:
-    name: product-backend
+    name: devops-backend
   datasource:
     url: jdbc:postgresql://database:5432/postgres_db
     username: postgres_user

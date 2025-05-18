@@ -4,8 +4,6 @@ metadata:
   name: main-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_set_header X-Forwarded-Prefix /grafana;
 spec:
   rules:
     - http:

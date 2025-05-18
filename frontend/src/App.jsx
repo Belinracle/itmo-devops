@@ -14,7 +14,9 @@ import Admin from "./Admin.jsx";
 const router = createBrowserRouter([
     { path: "/", element: <Home/> },
     { path: "/admin", element: <Admin/> },
-]);
+],{
+      basename: "/frontend", // ← Вот он ключевой момент!
+    });
 
 const App = () => {
     return (

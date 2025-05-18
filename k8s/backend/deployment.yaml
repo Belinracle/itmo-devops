@@ -13,7 +13,7 @@ spec:
         app: devops-backend
     spec:
       containers:
-        - name: devops-backend
+        - name: backend-container
           image: ghcr.io/belinracle/itmo-devops/devops-backend:latest
           ports:
             - containerPort: 8080
@@ -24,3 +24,8 @@ spec:
               value: "postgres_user"
             - name: SPRING_DATASOURCE_PASSWORD
               value: "postgres_password"
+          resources:
+            requests:
+              cpu: "100m"  # Обязательно!
+            limits:
+              cpu: "500m"

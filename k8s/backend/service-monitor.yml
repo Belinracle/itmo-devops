@@ -1,14 +1,15 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: devops-backend-monitor
-  namespace: default
+  name: backend-monitor
+  labels:
+    release: prometheus
 spec:
   jobLabel: devops-backend
   endpoints:
     - port: http
       path: /actuator/prometheus
-      interval: 10s
+      interval: 15s
   selector:
     matchLabels:
       app: devops-backend

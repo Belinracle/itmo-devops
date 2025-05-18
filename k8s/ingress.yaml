@@ -8,8 +8,8 @@ spec:
   rules:
     - http:
         paths:
-          - path: /frontend
-            pathType: Prefix
+          - path: /frontend(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: devops-frontend-service
@@ -28,8 +28,8 @@ spec:
 
     - http:
         paths:
-          - path: /grafana
-            pathType: Prefix
+          - path: /grafana(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: grafana-service

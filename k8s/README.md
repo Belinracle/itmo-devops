@@ -13,3 +13,5 @@ kubectl get events
 
 minikube ip
 
+![img.png](img.png)
+

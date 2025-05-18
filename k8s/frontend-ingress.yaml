@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: devops-frontend-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      try_files $uri $uri/ /frontend/index.html =404;
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /frontend(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: devops-frontend-service
+                port:
+                  number: 80

@@ -8,16 +8,6 @@ spec:
   rules:
     - http:
         paths:
-          - path: /frontend(/|$)(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: devops-frontend-service
-                port:
-                  number: 80
-
-    - http:
-        paths:
           - path: /backend(/|$)(.*)
             pathType: ImplementationSpecific
             backend:

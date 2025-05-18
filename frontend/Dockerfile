@@ -1,20 +1,30 @@
-FROM node:20 AS builder
+# Stage 1: Сборка фронтенда с помощью Node.js
+FROM node:18 as builder
 
 WORKDIR /app
-COPY package.json package-lock.json ./
+
+# Копируем package.json и package-lock.json (если есть)
+COPY package*.json ./
+
+# Устанавливаем зависимости
 RUN npm ci
 
-COPY ./ ./
-ARG VITE_BACKEND_URL
-ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+# Копируем исходники
+COPY . .
 
+# Устанавливаем base для Vite через env или vite.config.js
+# (смотри ниже как это сделать)
+
+# Собираем проект
 RUN npm run build
 
-FROM node:20 AS runner
+# Stage 2: Отдаем статику через Nginx
+FROM nginx:latest
 
-WORKDIR /app
-RUN npm install -g serve
+# Копируем наш кастомный конфиг Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY --from=builder /app/dist ./dist
+# Копируем результат сборки из первой стадии
+COPY --from=builder /app/dist /etc/nginx/html
 
-CMD ["serve", "dist"]
+EXPOSE 80

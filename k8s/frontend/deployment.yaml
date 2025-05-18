@@ -16,7 +16,7 @@ spec:
         - name: devops-frontend
           image: ghcr.io/belinracle/itmo-devops/devops-frontend:latest
           ports:
-            - containerPort: 3000
+            - containerPort: 80
           env:
             - name: API_URL
               value: "http://devops-backend-service"

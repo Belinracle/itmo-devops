@@ -1,24 +1,12 @@
-main:
+phantom:
+  address: 192.168.49.2:80
+  # address: app.local
+  load_profile:
+    load_type: rps
+    schedule: line(100, 1000, 1m)
+  uris:
+    - "/backend/api/products"
+telegraf:
+  enabled: false
+console:
   enabled: true
-  package: yandextank.contrib.netort.netort
-  config:
-    gun:
-      type: http
-      target: "http://192.168.49.2"
-      ammo:
-        - name: "GET backend/api/products"
-          method: GET
-          url: "/backend/api/products"
-
-    pools:
-      - id: main-pool
-        gun: main-gun
-        model:
-          type: rps
-          schedule:
-            - step:
-                from: 100
-                to: 1000
-                duration: 1m
-                pause: 0s
-          limit: 1000

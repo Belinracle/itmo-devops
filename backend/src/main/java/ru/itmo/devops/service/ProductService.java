@@ -1,12 +1,17 @@
 package ru.itmo.devops.service;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import ru.itmo.devops.dto.FilterDTO;
+import ru.itmo.devops.dto.MessageDTO;
 import ru.itmo.devops.entity.ProductEntity;
 import ru.itmo.devops.repository.ProductRepository;
 
@@ -15,10 +20,29 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
+    private static final String URL_FORMAT = "https://api.telegram.org/bot%s/sendMessage";
+
     private final ProductRepository productRepository;
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @Value("${tg.botToken}")
+    private String botToken;
+
+    @Value("${tg.chatId}")
+    private String chatId;
+
+    @PostConstruct
+    private void checkEnv() {
+        if (StringUtils.isAnyBlank(botToken, chatId)) {
+            throw new RuntimeException("Environment variable TG_BOT_TOKEN and/or TG_CHAT_ID was not set!");
+        }
+    }
 
     public ProductEntity save(ProductEntity productEntity) {
-        return productRepository.save(productEntity);
+        var result = productRepository.save(productEntity);
+        var msg = new MessageDTO(chatId, "Добавлен новый продукт:\n\n" + result);
+        restTemplate.postForEntity(String.format(URL_FORMAT, botToken), msg, String.class);
+        return result;
     }
 
     public Page<ProductEntity> findAllMatching(FilterDTO filter) {

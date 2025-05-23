@@ -22,8 +22,3 @@ main:
                 duration: 1m
                 pause: 0s
           limit: 1000
-
-console:
-  enabled: true
-  package: yandextank.plugins.ConsoleOnline
-  config: {}

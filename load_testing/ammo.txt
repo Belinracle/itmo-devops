@@ -1,2 +1,0 @@
-[GET backend/api/products]
-GET backend/api/products HTTP/1.1

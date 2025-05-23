@@ -1,27 +1,29 @@
 main:
-  gun:
-    type: http
-    target: "http://192.168.49.2"  # Адрес тестируемого сервиса
-    ammo:
-      - name: "GET backend/api/products"
-        method: GET
-        url: "backend/api/products"
+  enabled: true
+  package: yandextank.contrib.netort.netort
+  config:
+    gun:
+      type: http
+      target: "http://192.168.49.2"
+      ammo:
+        - name: "GET backend/api/products"
+          method: GET
+          url: "/backend/api/products"
 
-  pools:
-    - id: main-pool
-      gun: main-gun
-      model:
-        type: rps
-        schedule:
-          - step:
-              from: 100
-              to: 1000
-              duration: 1m
-              pause: 0s
-        limit: 1000  # max RPS
-
-  log:
-    level: info
+    pools:
+      - id: main-pool
+        gun: main-gun
+        model:
+          type: rps
+          schedule:
+            - step:
+                from: 100
+                to: 1000
+                duration: 1m
+                pause: 0s
+          limit: 1000
 
 console:
   enabled: true
+  package: yandextank.plugins.ConsoleOnline
+  config: {}

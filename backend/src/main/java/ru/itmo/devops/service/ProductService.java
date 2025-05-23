@@ -3,12 +3,14 @@ package ru.itmo.devops.service;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.itmo.devops.dto.FilterDTO;
 import ru.itmo.devops.dto.MessageDTO;
@@ -17,10 +19,13 @@ import ru.itmo.devops.repository.ProductRepository;
 
 import java.util.NoSuchElementException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService {
     private static final String URL_FORMAT = "https://api.telegram.org/bot%s/sendMessage";
+    private static final String ADD_MSG_FORMAT = "Добавлен новый продукт c id %d:\n\n%s";
+    private static final String UPD_MSG_FORMAT = "Продукт с id %d изменен:\n\n%s";
 
     private final ProductRepository productRepository;
     private final RestTemplate restTemplate = new RestTemplate();
@@ -39,9 +44,15 @@ public class ProductService {
     }
 
     public ProductEntity save(ProductEntity productEntity) {
+        var msgFormat = productEntity.getId() == null ? ADD_MSG_FORMAT : UPD_MSG_FORMAT;
         var result = productRepository.save(productEntity);
-        var msg = new MessageDTO(chatId, "Добавлен новый продукт:\n\n" + result);
-        restTemplate.postForEntity(String.format(URL_FORMAT, botToken), msg, String.class);
+
+        var msg = new MessageDTO(chatId, String.format(msgFormat, result.getId(), result));
+        try {
+            restTemplate.postForEntity(String.format(URL_FORMAT, botToken), msg, String.class);
+        } catch (HttpClientErrorException e) {
+            log.error(e.getMessage(), e);
+        }
         return result;
     }
 

@@ -4,7 +4,7 @@ phantom:
   ssl: false
   load_profile:
     load_type: rps
-    schedule: step(10, 100, 10, 1m)  # Каждую минуту +10 RPS до 100
+    schedule: step(100, 1000, 100, 1m)  # Каждую минуту +10 RPS до 100
   instances: 1000  # максимальное количество параллельных соединений
   ammo_file: ammo.txt  # файл с запросами
 

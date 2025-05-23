@@ -1,5 +1,5 @@
 phantom:
-  address: example.com
+  address: 192.168.49.2
   port: 80
   ssl: false
   load_profile:

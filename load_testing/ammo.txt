@@ -1,7 +1,2 @@
-[GET /api/products]
-GET /api/products HTTP/1.1
-Host: example.com
-
-[GET /api/product/1]
-GET /api/product/1 HTTP/1.1
-Host: example.com
+[GET backend/api/products]
+GET backend/api/products HTTP/1.1

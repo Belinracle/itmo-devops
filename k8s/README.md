@@ -15,3 +15,6 @@ minikube ip
 
 ![img.png](img.png)
 
+
+раскатить последний лейтест kubectl rollout restart deployment/devops-frontend
+

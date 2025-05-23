@@ -25,9 +25,9 @@ spec:
             - name: SPRING_DATASOURCE_PASSWORD
               value: "postgres_password"
             - name: TG_BOT_TOKEN
-              value: ""
+              value: "a"
             - name: TG_CHAT_ID
-              value: ""
+              value: "b"
           resources:
             requests:
               cpu: "100m"  # Обязательно!

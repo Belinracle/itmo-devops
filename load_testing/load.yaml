@@ -1,6 +1,6 @@
 phantom:
   address: 192.168.49.2
-  port: 80
+  port: "80"
   ssl: false
   load_profile:
     load_type: rps

@@ -1,14 +1,27 @@
-phantom:
-  address: 192.168.49.2
-  port: "80"
-  ssl: false
-  load_profile:
-    load_type: rps
-    schedule: step(100, 1000, 100, 1m)  # Каждую минуту +10 RPS до 100
-  instances: 1000  # максимальное количество параллельных соединений
-  ammo:
-    - type: uri
-      file: ammo.txt
+main:
+  gun:
+    type: http
+    target: "http://192.168.49.2"  # Адрес тестируемого сервиса
+    ammo:
+      - name: "GET backend/api/products"
+        method: GET
+        url: "backend/api/products"
+
+  pools:
+    - id: main-pool
+      gun: main-gun
+      model:
+        type: rps
+        schedule:
+          - step:
+              from: 100
+              to: 1000
+              duration: 1m
+              pause: 0s
+        limit: 1000  # max RPS
+
+  log:
+    level: info
 
 console:
   enabled: true

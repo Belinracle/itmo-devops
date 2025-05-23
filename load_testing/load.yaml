@@ -1,11 +1,10 @@
 phantom:
-  address: 192.168.49.2:80
-  # address: app.local
+  address: dva-gandona-gitlab.ru:61109
+  ssl: true
   load_profile:
     load_type: rps
-    schedule: line(100, 1000, 1m)
-  uris:
-    - "/backend/api/products"
+    schedule: line(20, 100, 1m)
+  ammofile: ammo.txt
 telegraf:
   enabled: false
 console:

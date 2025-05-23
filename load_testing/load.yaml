@@ -6,7 +6,9 @@ phantom:
     load_type: rps
     schedule: step(100, 1000, 100, 1m)  # Каждую минуту +10 RPS до 100
   instances: 1000  # максимальное количество параллельных соединений
-  ammo_file: ammo.txt  # файл с запросами
+  ammo:
+    - type: uri
+      file: ammo.txt
 
 console:
   enabled: true

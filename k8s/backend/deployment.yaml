@@ -18,6 +18,9 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: tg-secrets
           env:
             - name: SPRING_DATASOURCE_URL
               value: "jdbc:postgresql://devops-postgres:5432/postgres_db"
@@ -27,6 +30,6 @@ spec:
               value: "postgres_password"
           resources:
             requests:
-              cpu: "100m"  # Обязательно!
+              cpu: "100m"
             limits:
               cpu: "500m"

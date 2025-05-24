@@ -3,7 +3,7 @@ kind: ServiceMonitor
 metadata:
   name: backend-monitor
   labels:
-    release: prometheus
+    release: kube-prometheus-stack  # ← Изменили здесь
 spec:
   jobLabel: devops-backend
   endpoints:
@@ -11,7 +11,7 @@ spec:
       path: /actuator/prometheus
       interval: 15s
       params:
-        Accept: [ "text/plain" ]  # Обманываем Prometheus
+        Accept: [ "text/plain" ]  # для обхода 406
   selector:
     matchLabels:
       app: devops-backend

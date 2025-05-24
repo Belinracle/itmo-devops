@@ -18,7 +18,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
-          port: 57601
+          port: 57609
           username: daniel
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |

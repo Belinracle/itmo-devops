@@ -11,6 +11,9 @@ import "dayjs/locale/ru";
 import { theme } from "./theme.js";
 import Home from "./Home.jsx";
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8080";
+const apiUrl = `${backendUrl}/api/products`;
+
 const renderWithContext = () => render(
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
         <ThemeProvider theme={theme} defaultMode="light" noSsr>
@@ -67,7 +70,7 @@ describe("Home component", () => {
         await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
         const [url] = global.fetch.mock.calls[0];
 
-        expect(url).toBe("http://localhost:8080/api/products?pageNumber=0&pageSize=10");
+        expect(url).toBe(`${apiUrl}?pageNumber=0&pageSize=10`);
         expect(screen.queryByText("Товары не найдены 😔")).toBeInTheDocument();
     });
 
@@ -82,8 +85,8 @@ describe("Home component", () => {
         await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
         const [url] = global.fetch.mock.calls[0];
 
-        expect(url).toBe("http://localhost:8080/api/products?pageNumber=0&pageSize=10");
-        const span = screen.queryByText(/Найдено товаров/);
+        expect(url).toBe(`${apiUrl}?pageNumber=0&pageSize=10`);
+        const span = await screen.findByText(/Найдено товаров/);
         expect(span).toBeInTheDocument();
         expect(within(span).queryByText("27")).toBeInTheDocument();
     });
@@ -99,8 +102,8 @@ describe("Home component", () => {
         await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
         const [url] = global.fetch.mock.calls[0];
 
-        expect(url).toBe("http://localhost:8080/api/products?pageNumber=0&pageSize=10");
-        expect(screen.getAllByText("iPhone 16").length).toBe(10);
+        expect(url).toBe(`${apiUrl}?pageNumber=0&pageSize=10`);
+        await waitFor(() => expect(screen.getAllByText("iPhone 16").length).toBe(10));
     });
 
     it("Должен отображать 7 товаров на станице 3", async () => {
@@ -118,12 +121,12 @@ describe("Home component", () => {
         renderWithContext();
 
         await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
-        fireEvent.click(screen.getByRole("button", { name: "Перейти на 3 страницу" }));
+        fireEvent.click(await screen.findByRole("button", { name: "Перейти на 3 страницу" }));
         await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(2));
 
         const [url] = global.fetch.mock.calls[1];
-        expect(url).toBe("http://localhost:8080/api/products?pageNumber=2&pageSize=10");
-        expect(screen.getAllByText("iPhone 16").length).toBe(7);
+        expect(url).toBe(`${apiUrl}?pageNumber=2&pageSize=10`);
+        await waitFor(() => expect(screen.getAllByText("iPhone 16").length).toBe(7));
     });
 
     it("Должен отображать 27 товаров при смене размера страницы на 30", async () => {
@@ -141,11 +144,11 @@ describe("Home component", () => {
         renderWithContext();
 
         await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
-        fireEvent.click(screen.getByText("30"));
+        fireEvent.click(await screen.findByText("30"));
         await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(2));
 
         const [url] = global.fetch.mock.calls[1];
-        expect(url).toBe("http://localhost:8080/api/products?pageNumber=0&pageSize=30");
-        expect(screen.getAllByText("iPhone 16").length).toBe(27);
+        expect(url).toBe(`${apiUrl}?pageNumber=0&pageSize=30`);
+        await waitFor(() => expect(screen.getAllByText("iPhone 16").length).toBe(27));
     });
 });

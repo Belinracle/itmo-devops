@@ -11,6 +11,9 @@ import "dayjs/locale/ru";
 import { theme } from "./theme.js";
 import Admin from "./Admin.jsx";
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8080";
+const apiUrl = `${backendUrl}/api/products`;
+
 const renderWithContext = () => render(
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
         <ThemeProvider theme={theme} defaultMode="light" noSsr>
@@ -96,7 +99,7 @@ describe("Admin component", () => {
             await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
             const [url, options] = global.fetch.mock.calls[0];
 
-            expect(url).toBe("http://localhost:8080/api/products");
+            expect(url).toBe(`${apiUrl}`);
             expect(options.method).toBe("POST");
             expect(options.body).toBe(JSON.stringify(productWithoutId));
             expect(screen.queryByText("Продукт успешно добавлен! Его ID: 1")).toBeInTheDocument();
@@ -120,7 +123,7 @@ describe("Admin component", () => {
             await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
             const [url, options] = global.fetch.mock.calls[0];
 
-            expect(url).toBe("http://localhost:8080/api/products");
+            expect(url).toBe(`${apiUrl}`);
             expect(options.method).toBe("POST");
             expect(options.body).toBe(JSON.stringify(productWithoutId));
             expect(screen.queryByText("При добавлении произошла ошибка! Код: 500")).toBeInTheDocument();
@@ -140,7 +143,7 @@ describe("Admin component", () => {
             await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
             const [url, options] = global.fetch.mock.calls[0];
 
-            expect(url).toBe("http://localhost:8080/api/products");
+            expect(url).toBe(`${apiUrl}`);
             expect(options.method).toBe("POST");
             expect(options.body).toBe(JSON.stringify(productWithoutId));
             expect(screen.queryByText("При добавлении произошла ошибка связи!")).toBeInTheDocument();
@@ -186,7 +189,7 @@ describe("Admin component", () => {
             await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
             const [url, options] = global.fetch.mock.calls[0];
 
-            expect(url).toBe("http://localhost:8080/api/products/1");
+            expect(url).toBe(`${apiUrl}/1`);
             expect(options.method).toBe("PUT");
             expect(options.body).toBe(JSON.stringify(product));
             expect(screen.queryByText("Продукт с ID 1 успешно обновлен!")).toBeInTheDocument();
@@ -208,7 +211,7 @@ describe("Admin component", () => {
             await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
             const [url, options] = global.fetch.mock.calls[0];
 
-            expect(url).toBe("http://localhost:8080/api/products/2");
+            expect(url).toBe(`${apiUrl}/2`);
             expect(options.method).toBe("PUT");
             expect(options.body).toBe(JSON.stringify({ ...product, id: "2" }));
             expect(screen.queryByText("При обновлении произошла ошибка! Код: 404")).toBeInTheDocument();
@@ -228,7 +231,7 @@ describe("Admin component", () => {
             await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
             const [url, options] = global.fetch.mock.calls[0];
 
-            expect(url).toBe("http://localhost:8080/api/products/1");
+            expect(url).toBe(`${apiUrl}/1`);
             expect(options.method).toBe("PUT");
             expect(options.body).toBe(JSON.stringify(product));
             expect(screen.queryByText("При обновлении произошла ошибка связи!")).toBeInTheDocument();
@@ -274,7 +277,7 @@ describe("Admin component", () => {
             await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
             const [url, options] = global.fetch.mock.calls[0];
 
-            expect(url).toBe("http://localhost:8080/api/products/1");
+            expect(url).toBe(`${apiUrl}/1`);
             expect(options.method).toBe("DELETE");
             expect(screen.queryByText("Продукт с ID 1 успешно удален!")).toBeInTheDocument();
         });
@@ -287,7 +290,7 @@ describe("Admin component", () => {
             await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
             const [url, options] = global.fetch.mock.calls[0];
 
-            expect(url).toBe("http://localhost:8080/api/products/2");
+            expect(url).toBe(`${apiUrl}/2`);
             expect(options.method).toBe("DELETE");
             expect(screen.queryByText("При удалении произошла ошибка! Код: 404")).toBeInTheDocument();
         });
@@ -300,7 +303,7 @@ describe("Admin component", () => {
             await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
             const [url, options] = global.fetch.mock.calls[0];
 
-            expect(url).toBe("http://localhost:8080/api/products/1");
+            expect(url).toBe(`${apiUrl}/1`);
             expect(options.method).toBe("DELETE");
             expect(screen.queryByText("При удалении произошла ошибка связи!")).toBeInTheDocument();
         });

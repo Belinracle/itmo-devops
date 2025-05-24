@@ -19,3 +19,4 @@ minikube ip
 раскатить последний лейтест kubectl rollout restart deployment/devops-frontend
 
 прокидка портов  kubectl port-forward svc/kube-prometheus-stack-grafana 3000:80
+kubectl port-forward svc/kube-prometheus-stack-prometheus 9090

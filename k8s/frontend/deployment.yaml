@@ -15,6 +15,7 @@ spec:
       containers:
         - name: devops-frontend
           image: ghcr.io/belinracle/itmo-devops/devops-frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:

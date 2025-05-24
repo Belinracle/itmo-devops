@@ -30,7 +30,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: ghcr.io/${{ secrets.GHCR_USER }}/devops-backend:latest
+          tags: ghcr.io/belinracle/itmo-devops/devops-backend:latest
 
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v5
@@ -38,21 +38,34 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: ghcr.io/${{ secrets.GHCR_USER }}/devops-frontend:latest
+          tags: ghcr.io/belinracle/itmo-devops/devops-frontend:latest
 
       - name: Set up Kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
 
-      - name: Set up kubeconfig
+      - name: Configure KUBECONFIG
         run: |
           mkdir -p ~/.kube
           echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > ~/.kube/config
           chmod 600 ~/.kube/config
 
-      - name: Deploy to Kubernetes
+      - name: Verify connection to cluster
+        run: |
+          kubectl version --client
+          kubectl cluster-info
+
+      - name: Deploy app to Kubernetes
         run: |
           cd k8s
-          kubectl apply -f devops-apps.yaml
-          kubectl apply -f ingress.yaml
+          kubectl apply -f backend/deployment.yaml
+          kubectl apply -f frontend/deployment.yaml
+          kubectl rollout restart deployment/devops-backend
+          kubectl rollout restart deployment/devops-frontend
+          kubectl rollout status deployment/devops-backend
+          kubectl rollout status deployment/devops-frontend
+
+      - name: Restart Prometheus if needed (опционально)
+        run: |
+          kubectl rollout restart statefulset/prometheus-kube-prometheus-stack-prometheus

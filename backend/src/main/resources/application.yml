@@ -30,5 +30,5 @@ spring:
     show-sql: true
 
 tg:
-  botToken: ${TG_BOT_TOKEN}
-  chatId: ${TG_CHAT_ID}
+  botToken: ${TG_BOT_TOKEN:test}
+  chatId: ${TG_CHAT_ID:test}

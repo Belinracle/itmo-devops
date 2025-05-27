@@ -40,10 +40,7 @@ jobs:
       - name: Run tests + generate JaCoCo report
         working-directory: ./backend
         run: |
-          mvn test
-          mkdir -p target/site/jacoco
-          cp target/jacoco.exec target/site/jacoco/
-          mvn jacoco:report
+          mvn package
 
       - name: Cache SonarQube packages
         uses: actions/cache@v3

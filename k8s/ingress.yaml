@@ -25,12 +25,3 @@ spec:
                 name: grafana-service
                 port:
                   number: 3000
-    - http:
-        paths:
-          - path: /sonarqube(/|$)(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: sonarqube
-                port:
-                  number: 9000

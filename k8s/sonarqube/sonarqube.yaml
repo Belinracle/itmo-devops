@@ -73,7 +73,7 @@ spec:
   ports:
     - port: 9000        # Порт сервиса
       targetPort: 9000   # Порт контейнера
-      nodePort: 40000    # Порт на ноде
+      nodePort: 32000    # Порт на ноде
       protocol: TCP
       name: http
   selector:

@@ -64,7 +64,7 @@ jobs:
       - run: npm ci
       - run: npm test
   dockerBuildAndPush:
-    name: Build and Push to GitHub Container Registry
+    name: Build and Push to GitHub Container Registry and deploy
     runs-on: ubuntu-latest
     needs: [ backendBuild, frontendBuild ]
     permissions:

@@ -91,7 +91,7 @@ jobs:
         run: |
           mvn sonar:sonar \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.host.url=http://192.168.49.2:40000 \
+            -Dsonar.host.url=https://dva-gandona-gitlab.ru:62207 \
             -Dsonar.source.encoding=UTF-8
   dockerBuildAndPush:
     name: Build and Push to GitHub Container Registry and deploy

@@ -97,7 +97,9 @@ jobs:
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
           -Dsonar.host.url=https://dva-gandona-gitlab.ru:62207  \
           -Dsonar.source.encoding=UTF-8 \
-          -Dsonar.java.binaries=target/classes
+          -Dsonar.java.binaries=target/classes \
+          -Dsonar.junit.reportsPath=target/surefire-reports \
+          -Dsonar.coverage.jacoco.reportPaths=target/site/jacoco/jacoco.xml
   dockerBuildAndPush:
     name: Build and Push to GitHub Container Registry and deploy
     runs-on: ubuntu-latest

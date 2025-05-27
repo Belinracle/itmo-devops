@@ -18,6 +18,7 @@ import ru.itmo.devops.entity.ProductEntity;
 import ru.itmo.devops.repository.ProductRepository;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -48,10 +49,12 @@ public class ProductService {
         var result = productRepository.save(productEntity);
 
         var msg = new MessageDTO(chatId, String.format(msgFormat, result.getId(), result));
-        try {
-            restTemplate.postForEntity(String.format(URL_FORMAT, botToken), msg, String.class);
-        } catch (HttpClientErrorException e) {
-            log.error(e.getMessage(), e);
+        if(!Objects.equals(botToken, "test")) {
+            try {
+                restTemplate.postForEntity(String.format(URL_FORMAT, botToken), msg, String.class);
+            } catch (HttpClientErrorException e) {
+                log.error(e.getMessage(), e);
+            }
         }
         return result;
     }

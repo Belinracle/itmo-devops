@@ -86,6 +86,10 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
+      - name: Build project (compile)
+        working-directory: ./backend
+        run: mvn compile
+
       - name: Run SonarQube analysis
         working-directory: ./backend
         run: |

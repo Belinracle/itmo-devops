@@ -63,6 +63,36 @@ jobs:
           node-version: '20.x'
       - run: npm ci
       - run: npm test
+  sonarqubeAnalysis:
+    name: SonarQube Analysis
+    needs: [ backendTest ]  # Запускается только если тесты прошли
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Чтобы работал анализ истории
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: 21
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Run SonarQube analysis
+        working-directory: ./backend
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.host.url=http://192.168.49.2:40000 \
+            -Dsonar.source.encoding=UTF-8
   dockerBuildAndPush:
     name: Build and Push to GitHub Container Registry and deploy
     runs-on: ubuntu-latest

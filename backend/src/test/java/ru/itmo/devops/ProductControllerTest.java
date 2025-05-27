@@ -81,6 +81,31 @@ class ProductControllerTest {
 
     @Test
     @Order(2)
+    void shouldGetFilteredProducts() {
+        String requestParams = String.join("&",
+                "fromPrice=1.0",
+                "toPrice=2.0",
+                "fromRating=1.0",
+                "toRating=5.0",
+                "manufacturerId=1",
+                "countryId=1",
+                "fromDate=2024-01-01",
+                "toDate=2048-01-01",
+                "pageNumber=0",
+                "pageSize=20"
+        );
+
+        Map<String, Object> productsResponse = given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("api/products?" + requestParams).as(new TypeRef<>() {
+                });
+        val productList = (List<String>) productsResponse.get("content");
+        assertEquals(1, productList.size());
+    }
+
+    @Test
+    @Order(3)
     void shouldGetById() {
         given()
                 .contentType(ContentType.JSON)
@@ -92,7 +117,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void shouldGetByIdFail() {
         given()
                 .contentType(ContentType.JSON)
@@ -103,7 +128,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void shouldDelete() {
         given()
                 .contentType(ContentType.JSON)
@@ -116,7 +141,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     void shouldInsert() {
         val productRequest = new ProductEntity(null, 5D, 5D, 5, "5", LocalDate.now(), 5, 5);
         given()
@@ -132,7 +157,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     void shouldUpdate() {
         val productRequest = new ProductEntity(1L, 55D, 1D, 1, "1", LocalDate.now(), 1, 1);
         given()

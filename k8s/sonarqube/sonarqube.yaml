@@ -59,23 +59,3 @@ spec:
     - protocol: TCP
       port: 9000
       targetPort: 9000
-
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: sonarqube-ingress
-  namespace: sonarqube
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /sonarqube
-            pathType: Prefix
-            backend:
-              service:
-                name: sonarqube
-                port:
-                  number: 9000

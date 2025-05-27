@@ -18,7 +18,7 @@ import ru.itmo.devops.service.ProductService;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProductServiceTest {
+class ProductServiceTest {
     private static final Long PRODUCT_ID = 123L;
     private static final String BOT_TOKEN = "test";
     private static final String CHAT_ID = "test";

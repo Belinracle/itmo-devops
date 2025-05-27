@@ -7,7 +7,7 @@ import org.springframework.boot.SpringApplication;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DevopsApplicationTest {
+class DevopsApplicationTest {
     private static final List<String> BASE_ARGS = List.of(
             "--server.port=0",
             "--spring.jpa.hibernate.ddl-auto=none",

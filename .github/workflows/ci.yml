@@ -43,7 +43,6 @@ jobs:
           mvn test
           mkdir -p target/site/jacoco
           cp target/jacoco.exec target/site/jacoco/
-          # Для создания jacoco.xml используем специальный этап
           mvn jacoco:report
 
       - name: Cache SonarQube packages

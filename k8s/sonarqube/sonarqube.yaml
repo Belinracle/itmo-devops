@@ -61,21 +61,20 @@ spec:
       targetPort: 9000
 
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: v1
+kind: Service
 metadata:
-  name: sonarqube-ingress
+  name: sonarqube-nodeport
   namespace: sonarqube
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  labels:
+    app: sonarqube
 spec:
-  rules:
-    - http:
-        paths:
-          - path: /sonarqube(/|$)(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: sonarqube
-                port:
-                  number: 9000
+  type: NodePort
+  ports:
+    - port: 9000        # Порт сервиса
+      targetPort: 9000   # Порт контейнера
+      nodePort: 40000    # Порт на ноде
+      protocol: TCP
+      name: http
+  selector:
+    app: sonarqube

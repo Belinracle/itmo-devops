@@ -79,30 +79,30 @@ class ProductControllerTest {
         assertEquals(4, productList.size());
     }
 
-//    @Test
-//    @Order(2)
-//    void shouldGetFilteredProducts() {
-//        String requestParams = String.join("&",
-//                "fromPrice=1.0",
-//                "toPrice=2.0",
-//                "fromRating=1.0",
-//                "toRating=5.0",
-//                "manufacturerId=1",
-//                "countryId=1",
-//                "fromDate=2024-01-01",
-//                "toDate=2048-01-01",
-//                "pageNumber=0",
-//                "pageSize=20"
-//        );
-//
-//        Map<String, Object> productsResponse = given()
-//                .contentType(ContentType.JSON)
-//                .when()
-//                .get("api/products?" + requestParams).as(new TypeRef<>() {
-//                });
-//        val productList = (List<String>) productsResponse.get("content");
-//        assertEquals(1, productList.size());
-//    }
+    @Test
+    @Order(2)
+    void shouldGetFilteredProducts() {
+        String requestParams = String.join("&",
+                "fromPrice=1.0",
+                "toPrice=2.0",
+                "fromRating=1.0",
+                "toRating=5.0",
+                "manufacturerId=1",
+                "countryId=1",
+                "fromDate=2024-01-01",
+                "toDate=2048-01-01",
+                "pageNumber=0",
+                "pageSize=20"
+        );
+
+        Map<String, Object> productsResponse = given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("api/products?" + requestParams).as(new TypeRef<>() {
+                });
+        val productList = (List<String>) productsResponse.get("content");
+        assertEquals(1, productList.size());
+    }
 
     @Test
     @Order(3)

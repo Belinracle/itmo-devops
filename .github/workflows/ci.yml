@@ -124,3 +124,25 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: ghcr.io/belinracle/itmo-devops/devops-frontend:latest
+  deploy:
+    name: Deploy via SSH
+    runs-on: ubuntu-latest
+    needs: [ dockerBuildAndPush ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          port: 57609
+          username: daniel
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/daniel/devops/itmo-devops
+            git pull origin master
+            kubectl apply -f k8s/backend/deployment.yaml
+            kubectl apply -f k8s/frontend/deployment.yaml
+            kubectl rollout status deployment/devops-backend
+            kubectl rollout status deployment/devops-frontend

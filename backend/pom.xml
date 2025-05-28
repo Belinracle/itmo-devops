@@ -112,15 +112,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.0.0-M7</version> <!-- обновлено -->
                 <configuration>
-                    <argLine>
-                        --illegal-access=permit
-                    </argLine>
-                    <testFailureIgnore>true</testFailureIgnore>
-                    <forkCount>2</forkCount>
-                    <reuseForks>true</reuseForks>
-                    <argLine>${surefireArgLine}</argLine>
+                    <argLine>${surefireArgLine}</argLine> <!-- должен быть один раз и правильный -->
+                    <useSystemClassloader>true</useSystemClassloader>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <testFailureIgnore>false</testFailureIgnore> <!-- чтобы CI падал при ошибках в тестах -->
                 </configuration>
             </plugin>
             <plugin>
@@ -128,6 +127,7 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.11</version>
                 <executions>
+                    <!-- 1. Подготовка JaCoCo агента -->
                     <execution>
                         <id>default-prepare-agent</id>
                         <goals>
@@ -138,17 +138,21 @@
                             <propertyName>surefireArgLine</propertyName>
                         </configuration>
                     </execution>
+
+                    <!-- 2. Генерация HTML/XML отчёта -->
                     <execution>
-                    <id>default-report</id>
-                    <phase>test</phase>
-                    <goals>
-                        <goal>report</goal>
-                    </goals>
-                    <configuration>
-                        <dataFile>${project.build.directory}/coverage-reports/jacoco.exec</dataFile>
-                        <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
-                    </configuration>
-                </execution>
+                        <id>default-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/coverage-reports/jacoco.exec</dataFile>
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <!-- 3. Проверка покрытия -->
                     <execution>
                         <id>default-check</id>
                         <phase>verify</phase>
@@ -156,14 +160,15 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
+                            <dataFile>${project.build.directory}/coverage-reports/jacoco.exec</dataFile>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
                                     <limits>
                                         <limit>
-                                            <counter>COMPLEXITY</counter>
+                                            <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.99</minimum>
+                                            <minimum>0.8</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

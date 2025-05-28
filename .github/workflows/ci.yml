@@ -68,7 +68,7 @@ jobs:
       - name: Run tests + generate JaCoCo report
         working-directory: ./backend
         run: |
-          mvn package
+          mvn verify
 
       - name: Cache SonarQube packages
         uses: actions/cache@v3

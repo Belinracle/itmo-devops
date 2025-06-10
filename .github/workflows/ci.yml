@@ -87,8 +87,7 @@ jobs:
       - name: Run SonarQube analysis
         working-directory: ./backend
         run: |
-          mvn sonar:sonar \
-            -Dmaven.wagon.http.ssl.insecure=true \
+          mvn sonar:sonar -Dmaven.wagon.http.ssl.insecure=true \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.host.url=https://ad-capital.ru:62207  \
             -Dsonar.source.encoding=UTF-8 \

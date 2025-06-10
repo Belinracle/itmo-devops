@@ -77,12 +77,21 @@ jobs:
           # Проверяем, что jacoco.exec создан
           ls -la target/coverage-reports/jacoco.exec
 
+      - name: Cache SonarQube packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
       - name: Run SonarQube analysis
         working-directory: ./backend
         run: |
           mvn sonar:sonar -Dmaven.wagon.http.ssl.insecure=true \
             -Dmaven.wagon.http.ssl.allowall=true \
             -Dmaven.wagon.http.ssl.ignore.validity.dates=true \
+            -Djavax.net.ssl.trustStore=/dev/null \
+            -Djavax.net.ssl.trustStorePassword= \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.host.url=https://ad-capital.ru:62207  \
             -Dsonar.source.encoding=UTF-8 \

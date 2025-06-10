@@ -77,13 +77,6 @@ jobs:
           # Проверяем, что jacoco.exec создан
           ls -la target/coverage-reports/jacoco.exec
 
-      - name: Cache SonarQube packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
       - name: Run SonarQube analysis
         working-directory: ./backend
         run: |

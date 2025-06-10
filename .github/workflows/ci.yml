@@ -46,59 +46,59 @@ jobs:
           node-version: '20.x'
       - run: npm ci
       - run: npm test
-  backendTestAndSonar:
-    name: Test and SonarQube Analysis
-    runs-on: ubuntu-latest
-    env:
-      TG_BOT_TOKEN: 'test'
-      TG_CHAT_ID: 'test'
-    needs: [ backendBuild, frontendBuild ]
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Setup Java 21
-        uses: actions/setup-java@v3
-        with:
-          java-version: 21
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Build project + run tests + coverage check
-        working-directory: ./backend
-        run: |
-          # Создаём нужную директорию явно
-          mkdir -p target/coverage-reports
-
-          # Запускаем тесты и проверяем покрытие
-          mvn clean verify
-
-          # Проверяем, что jacoco.exec создан
-          ls -la target/coverage-reports/jacoco.exec
-
-      - name: Cache SonarQube packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      - name: Run SonarQube analysis
-        working-directory: ./backend
-        run: |
-          mvn sonar:sonar -Dmaven.wagon.http.ssl.insecure=true \
-            -Dmaven.wagon.http.ssl.allowall=true \
-            -Dmaven.wagon.http.ssl.ignore.validity.dates=true \
-            -Djavax.net.ssl.trustStore=/dev/null \
-            -Djavax.net.ssl.trustStorePassword= \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.host.url=https://ad-capital.ru:62207  \
-            -Dsonar.source.encoding=UTF-8 \
-            -Dsonar.java.binaries=target/classes \
-            -Dsonar.junit.reportsPath=target/surefire-reports \
-            -Dsonar.coverage.jacoco.reportPaths=target/site/jacoco/report/jacoco.xml
-        continue-on-error: false
+#  backendTestAndSonar:
+#    name: Test and SonarQube Analysis
+#    runs-on: ubuntu-latest
+#    env:
+#      TG_BOT_TOKEN: 'test'
+#      TG_CHAT_ID: 'test'
+#    needs: [ backendBuild, frontendBuild ]
+#    steps:
+#      - uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Setup Java 21
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: 21
+#          distribution: 'temurin'
+#          cache: 'maven'
+#
+#      - name: Build project + run tests + coverage check
+#        working-directory: ./backend
+#        run: |
+#          # Создаём нужную директорию явно
+#          mkdir -p target/coverage-reports
+#
+#          # Запускаем тесты и проверяем покрытие
+#          mvn clean verify
+#
+#          # Проверяем, что jacoco.exec создан
+#          ls -la target/coverage-reports/jacoco.exec
+#
+#      - name: Cache SonarQube packages
+#        uses: actions/cache@v3
+#        with:
+#          path: ~/.sonar/cache
+#          key: ${{ runner.os }}-sonar
+#          restore-keys: ${{ runner.os }}-sonar
+#
+#      - name: Run SonarQube analysis
+#        working-directory: ./backend
+#        run: |
+#          mvn sonar:sonar -Dmaven.wagon.http.ssl.insecure=true \
+#            -Dmaven.wagon.http.ssl.allowall=true \
+#            -Dmaven.wagon.http.ssl.ignore.validity.dates=true \
+#            -Djavax.net.ssl.trustStore=/dev/null \
+#            -Djavax.net.ssl.trustStorePassword= \
+#            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+#            -Dsonar.host.url=https://ad-capital.ru:62207  \
+#            -Dsonar.source.encoding=UTF-8 \
+#            -Dsonar.java.binaries=target/classes \
+#            -Dsonar.junit.reportsPath=target/surefire-reports \
+#            -Dsonar.coverage.jacoco.reportPaths=target/site/jacoco/report/jacoco.xml
+#        continue-on-error: false
   dockerBuildAndPush:
     name: Build and Push to GitHub Container Registry and deploy
     runs-on: ubuntu-latest

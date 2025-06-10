@@ -159,7 +159,7 @@ jobs:
   
             # Вариант 1: через kubectl set image
             kubectl set image deployment/devops-backend backend-container=ghcr.io/belinracle/itmo-devops/devops-backend:${{ github.sha }}
-            kubectl set image deployment/devops-frontend frontend-container=ghcr.io/belinracle/itmo-devops/devops-frontend:${{ github.sha }}
+            kubectl set image deployment/devops-frontend devops-frontend=ghcr.io/belinracle/itmo-devops/devops-frontend:${{ github.sha }}
   
             # Вариант 2: через envsubst (закомментируй предыдущий блок и раскомментируй этот):
             # envsubst < k8s/backend/deployment.yaml | kubectl apply -f -

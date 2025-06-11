@@ -97,7 +97,8 @@ jobs:
             -Dsonar.source.encoding=UTF-8 \
             -Dsonar.java.binaries=target/classes \
             -Dsonar.junit.reportsPath=target/surefire-reports \
-            -Dsonar.coverage.jacoco.reportPaths=target/site/jacoco/report/jacoco.xml
+            -Dsonar.coverage.jacoco.reportPaths=target/site/jacoco/report/jacoco.xml \
+            -Dsonar.qualitygate.wait=true
         continue-on-error: false
   dockerBuildAndPush:
     name: Build and Push to GitHub Container Registry

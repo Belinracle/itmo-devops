@@ -95,6 +95,8 @@ const Home = () => {
     const [pageNumber, setPageNumber] = useState(0);
     const [pageCount, setPageCount] = useState(0);
 
+    console.log("TEST CD");
+
     const handleOpenClick = () => {
         if (!isClosing) {
             setIsOpen(true);

@@ -10,6 +10,6 @@ RUN mvn package -Dmaven.test.skip
 FROM eclipse-temurin:21-jre-jammy
 
 WORKDIR /app
-COPY --from=builder /app/target/devops-0.0.1-SNAPSHOT.jar ./
+COPY --from=builder /app/target/devops-backend-0.0.1-SNAPSHOT.jar ./
 
-ENTRYPOINT ["java","-jar","devops-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-jar","devops-backend-0.0.1-SNAPSHOT.jar"]

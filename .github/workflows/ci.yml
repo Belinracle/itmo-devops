@@ -66,14 +66,14 @@ jobs:
           key: ${{ runner.os }}-sonar-frontend
           restore-keys: ${{ runner.os }}-sonar-frontend
 
-      - name: Run SonarQube Analysis
+      - name: Run SonarQube analysis
         uses: sonarsource/sonarqube-scan-action@master
         with:
           projectBaseDir: ./frontend
           args: >
             -Dsonar.host.url=https://ad-capital.ru:62207
-            -Dsonar.projectName=devops_frontend
-            -Dsonar.projectKey=devops_frontend
+            -Dsonar.projectName=devops-frontend
+            -Dsonar.projectKey=devops-frontend
             -Dsonar.ssl.verificationMode=NONE
             -Dsonar.source.encoding=UTF-8
             -Dsonar.sources=src
@@ -101,17 +101,9 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Build project + run tests + coverage check
+      - name: Run tests and generate coverage report
         working-directory: ./backend
-        run: |
-          # Создаём нужную директорию явно
-          mkdir -p target/coverage-reports
-
-          # Запускаем тесты и проверяем покрытие
-          mvn clean verify
-
-          # Проверяем, что jacoco.exec создан
-          ls -la target/coverage-reports/jacoco.exec
+        run: mvn clean verify
 
       - name: Cache SonarQube packages
         uses: actions/cache@v3
@@ -198,7 +190,7 @@ jobs:
             kubectl set image deployment/devops-backend backend-container=ghcr.io/belinracle/itmo-devops/devops-backend:${{ github.sha }}
             kubectl set image deployment/devops-frontend devops-frontend=ghcr.io/belinracle/itmo-devops/devops-frontend:${{ github.sha }}
   
-            # Вариант 2: через envsubst (закомментируй предыдущий блок и раскомментируй этот):
+            # Вариант 2: через envsubst
             # envsubst < k8s/backend/deployment.yaml | kubectl apply -f -
             # envsubst < k8s/frontend/deployment.yaml | kubectl apply -f -
   

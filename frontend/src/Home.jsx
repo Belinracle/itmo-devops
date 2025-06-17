@@ -54,12 +54,10 @@ const fetchProducts = (formState, pageNumber, pageSize, setIsLoading, setProduct
                 return;
             }
 
-            switch (type) {
-                case "dateRange":
-                    requestParams.append(filter, value.format("YYYY-MM-DD"));
-                    break;
-                default:
-                    requestParams.append(filter, value);
+            if (type === "dateRange") {
+                requestParams.append(filter, value.format("YYYY-MM-DD"));
+            } else {
+                requestParams.append(filter, value);
             }
         });
     });
@@ -89,8 +87,6 @@ const Home = () => {
     const [pageSize, setPageSize] = useState(10);
     const [pageNumber, setPageNumber] = useState(0);
     const [pageCount, setPageCount] = useState(0);
-
-    console.log("TEST CD");
 
     const handleOpenClick = () => {
         if (!isClosing) {

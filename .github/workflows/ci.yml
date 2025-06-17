@@ -72,6 +72,7 @@ jobs:
           projectBaseDir: ./frontend
           args: >
             -Dsonar.host.url=https://ad-capital.ru:62207
+            -Dsonar.projectName=devops_frontend
             -Dsonar.projectKey=devops_frontend
             -Dsonar.ssl.verificationMode=NONE
             -Dsonar.source.encoding=UTF-8

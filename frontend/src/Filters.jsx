@@ -6,7 +6,6 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 import CollapsibleBox from "./CollapsibleBox.jsx";
 import Input from "./Input.jsx";
-import StaticAutocomplete from "./StaticAutocomplete.jsx";
 
 const ResetButton = ({ onClick }) => (
     <Typography
@@ -115,13 +114,6 @@ const Filters = memo(({
                                 onChange={handleDateChange(filters[1])}
                             />
                         </Stack>
-                    ) : type === "autoComplete" ? (
-                        <StaticAutocomplete
-                            value={formState[filters[0]]}
-                            filter={filters[0]}
-                            setFormState={setFormState}
-                            emptyValueMap={emptyValueMap}
-                        />
                     ) : type === "number" ? (
                         <Input
                             label="Число"

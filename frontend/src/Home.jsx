@@ -26,14 +26,12 @@ import ProductPreview from "./ProductPreview.jsx";
 const controls = [
     { type: "numberRange", label: "Цена, ₽", filters: ["fromPrice", "toPrice"], placeholders: ["1", "100000"] },
     { type: "numberRange", label: "Рейтинг", filters: ["fromRating", "toRating"], placeholders: ["1", "5"] },
-    //{ type: "autoComplete", label: "Производитель", filters: ["manufacturers"] },
-    //{ type: "autoComplete", label: "Страна производства", filters: ["countries"] },
     { type: "number", label: "Производитель", filters: ["manufacturerId"], placeholders: ["Неотрицательное число"] },
     { type: "number", label: "Страна производства", filters: ["countryId"], placeholders: ["Неотрицательное число"] },
     { type: "dateRange", label: "Дата выпуска", filters: ["fromDate", "toDate"] },
 ];
 
-const emptyValueMap = { number: "", numberRange: "", dateRange: null, autoComplete: [] };
+const emptyValueMap = { number: "", numberRange: "", dateRange: null, };
 const emptyState = Object.fromEntries(
     controls.flatMap(({ type, filters }) => filters.map((filter) => [filter, emptyValueMap[type]]))
 );
@@ -57,9 +55,6 @@ const fetchProducts = (formState, pageNumber, pageSize, setIsLoading, setProduct
             }
 
             switch (type) {
-                case "autoComplete":
-                    value.forEach((el) => requestParams.append(filter, el.id));
-                    break;
                 case "dateRange":
                     requestParams.append(filter, value.format("YYYY-MM-DD"));
                     break;

@@ -126,6 +126,7 @@ jobs:
             -Dsonar.java.binaries=target/classes \
             -Dsonar.junit.reportsPath=target/surefire-reports \
             -Dsonar.coverage.jacoco.reportPaths=target/site/jacoco/report/jacoco.xml \
+            -Dsonar.coverage.exclusions=src/main/java/ru/itmo/devops/DevopsApplication.java \
             -Dsonar.qualitygate.wait=true
         continue-on-error: false
   dockerBuildAndPush:

@@ -41,6 +41,8 @@ jobs:
     defaults:
       run:
         working-directory: ./frontend
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -67,8 +69,8 @@ jobs:
         with:
           projectBaseDir: ./frontend
           args: >
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
-            -Dsonar.host.url=https://ad-capital.ru:62207 
+            -Dsonar.host.url=https://ad-capital.ru:62207
+            -Dsonar.projectKey=devops_frontend
             -Dsonar.ssl.verificationMode=NONE
             -Dsonar.sources=src
             -Dsonar.source.encoding=UTF-8

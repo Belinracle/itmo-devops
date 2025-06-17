@@ -45,6 +45,8 @@ jobs:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -72,11 +74,12 @@ jobs:
             -Dsonar.host.url=https://ad-capital.ru:62207
             -Dsonar.projectKey=devops_frontend
             -Dsonar.ssl.verificationMode=NONE
-            -Dsonar.sources=src
             -Dsonar.source.encoding=UTF-8
+            -Dsonar.sources=src
+            -Dsonar.tests=src
+            -Dsonar.test.inclusions=**/*.test.*
             -Dsonar.qualitygate.wait=true
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-            -Dsonar.coverage.exclusions=**/*.test.*
   backendTestAndSonar:
     name: Backend Test and Sonar Analysis
     runs-on: ubuntu-latest

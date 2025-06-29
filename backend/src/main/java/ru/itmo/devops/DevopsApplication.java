@@ -9,7 +9,6 @@ import org.springframework.web.client.RestTemplate;
 public class DevopsApplication {
 
     public static void main(String[] args) {
-        //System.out.println("проверка ci");
         SpringApplication.run(DevopsApplication.class, args);
     }
 
